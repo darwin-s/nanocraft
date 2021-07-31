@@ -15,7 +15,9 @@
 #ifndef NC_GAME_HPP
 #define NC_GAME_HPP
 
+#include <TextureAtlas.hpp>
 #include <SFML/Graphics.hpp>
+#include <nlohmann/json.hpp>
 
 namespace nc {
 
@@ -23,17 +25,23 @@ class Game {
 public:
     Game(int argc, char** argv);
     void run();
+    const nlohmann::json& getSettings() const;
+    void saveSettings();
+
     static Game* getInstance();
 
 private:
     void setup();
     void execute();
+    void loadSettings();
+    void createDefaultSettings();
 
 private:
     static Game* m_inst; // Game instance
 
     int m_argc;
     char** m_argv;
+    nlohmann::json m_settings;
 
     sf::RenderWindow m_win; // Game window
 };

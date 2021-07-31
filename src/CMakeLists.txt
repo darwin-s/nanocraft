@@ -6,16 +6,18 @@ set(NC_GENERATED
     ${CMAKE_CURRENT_BINARY_DIR}/../include/Version.hpp)
 
 set(NC_INCLUDES 
-    ../include/Game.hpp)
+    ../include/Game.hpp
+    ../include/TextureAtlas.hpp)
 
 set(NC_SOURCES
     main.cpp
-    Game.cpp)
+    Game.cpp
+    TextureAtlas.cpp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system network window audio graphics REQUIRED)
 add_executable(nanocraft WIN32 ${NC_SOURCES} ${NC_INCLUDES} ${NC_GENERATED})
-target_link_libraries(nanocraft PUBLIC sfml-graphics sfml-audio sfml-network sfml-window sfml-system)
+target_link_libraries(nanocraft PUBLIC json physfs-static entt sfml-graphics sfml-audio sfml-network sfml-window sfml-system)
 
 if (WIN32)
     target_link_libraries(nanocraft PUBLIC sfml-main)
