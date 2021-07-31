@@ -18,7 +18,7 @@
 
 namespace {
 
-unsigned int PAGE_SIZE = 32;
+unsigned int PAGE_SIZE = 0;
 
 }
 
