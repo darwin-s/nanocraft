@@ -10,6 +10,7 @@ set(NC_INCLUDES
     ../include/TextureAtlas.hpp)
 
 set(NC_SOURCES
+    ${imgui_sfml_src}
     main.cpp
     Game.cpp
     TextureAtlas.cpp)
@@ -17,7 +18,16 @@ set(NC_SOURCES
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system network window audio graphics REQUIRED)
 add_executable(nanocraft WIN32 ${NC_SOURCES} ${NC_INCLUDES} ${NC_GENERATED})
-target_link_libraries(nanocraft PUBLIC json physfs-static entt sfml-graphics sfml-audio sfml-network sfml-window sfml-system)
+target_link_libraries(nanocraft PUBLIC 
+    spdlog 
+    imgui-sfml 
+    json 
+    physfs-static 
+    entt sfml-graphics 
+    sfml-audio 
+    sfml-network 
+    sfml-window 
+    sfml-system)
 
 if (WIN32)
     target_link_libraries(nanocraft PUBLIC sfml-main)

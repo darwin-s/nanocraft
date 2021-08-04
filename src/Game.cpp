@@ -14,6 +14,8 @@
 
 #include <Game.hpp>
 #include <Version.hpp>
+#include <imgui.h>
+#include <imgui-SFML.h>
 #include <physfs.h>
 #include <iostream>
 #include <filesystem>
@@ -25,9 +27,15 @@ namespace nc {
 
 Game* Game::m_inst = nullptr;
 
-Game::Game(int argc, char** argv) : m_argc(argc), m_argv(argv) {
+Game::Game(int argc, char** argv)
+    : m_argc(argc), m_argv(argv), m_drawConsole(false) {
     assert(m_inst == nullptr);
     m_inst = this;
+
+    m_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(m_logData);
+    m_logger = std::make_shared<spdlog::logger>("nanolog", m_sink);
+    m_logger->set_level(spdlog::level::trace);
+    spdlog::set_default_logger(m_logger);
 }
 
 void Game::run() {
@@ -55,35 +63,34 @@ void Game::setup() {
         throw std::runtime_error("Failed to initialize PHYSFS!");
     }
 
-    std::cout << "Nanocraft v" << NC_VER_MAJOR << "." << NC_VER_MINOR << "."
-              << NC_VER_PATCH << "." << NC_VER_TWEAK << std::endl;
+    spdlog::info("Nanocraft v{}.{}.{}.{}", NC_VER_MAJOR, NC_VER_MINOR,
+                 NC_VER_PATCH, NC_VER_TWEAK);
     if (m_argc >= 2) {
-        std::cout << "Passed arguments:\n";
+        spdlog::info("Passed arguments:");
         for (int i = 1; i < m_argc; i++) {
-            std::cout << "\t" << m_argv[i] << "\n";
+            spdlog::info("\t{}", m_argv[i]);
         }
-        std::cout << std::flush;
     }
 
-    #ifndef NC_DEBUG
-        if (!std::filesystem::exists("data/base.zip") ||
-            !std::filesystem::is_regular_file("data/base.zip")) {
-            throw std::runtime_error(
-                "No base game data file found! (data/base.zip)");
-        }
-        if (!PHYSFS_mount("data/base.zip", "/", 0)) {
-            throw std::runtime_error(
-                "Could not load base game data file! (data/base.zip)");
-        }
-    #else
-        if (!std::filesystem::exists("data/base") ||
-            !std::filesystem::is_directory("data/base")) {
-            throw std::runtime_error("Could not find base game directory!");
-        }
-        if (!PHYSFS_mount("data/base", "/", 0)) {
-            throw std::runtime_error("Could not load base game directory!");
-        }
-    #endif
+#ifndef NC_DEBUG
+    if (!std::filesystem::exists("data/base.zip") ||
+        !std::filesystem::is_regular_file("data/base.zip")) {
+        throw std::runtime_error(
+            "No base game data file found! (data/base.zip)");
+    }
+    if (!PHYSFS_mount("data/base.zip", "/", 0)) {
+        throw std::runtime_error(
+            "Could not load base game data file! (data/base.zip)");
+    }
+#else
+    if (!std::filesystem::exists("data/base") ||
+        !std::filesystem::is_directory("data/base")) {
+        throw std::runtime_error("Could not find base game directory!");
+    }
+    if (!PHYSFS_mount("data/base", "/", 0)) {
+        throw std::runtime_error("Could not load base game directory!");
+    }
+#endif
 
     // Get settings from file if available
     if (std::filesystem::exists("settings.json")) {
@@ -108,17 +115,20 @@ void Game::setup() {
 
     m_win.create(sf::VideoMode(modeWidth, modeHeight), "Nanocraft",
                  windowStyle);
+
+    ImGui::SFML::Init(m_win);
+    ImGui::GetIO().IniFilename = nullptr;
 }
 
 void Game::execute() {
     TextureAtlas ta;
     ta.addTexture("grass.png");
     ta.addTexture("sand.png");
-    ta.addTexture("sky.png");
+    ta.addTexture("skys.png");
 
     TextureAtlas::TextureInfo grassTex = ta.getTexture("grass.png");
-    TextureAtlas::TextureInfo sandTex = ta.getTexture("sand.png");
-    TextureAtlas::TextureInfo skyTex = ta.getTexture("sky.png");
+    TextureAtlas::TextureInfo sandTex  = ta.getTexture("sand.png");
+    TextureAtlas::TextureInfo skyTex   = ta.getTexture("skys.png");
 
     sf::Sprite grass;
     sf::Sprite sand;
@@ -139,9 +149,26 @@ void Game::execute() {
         // Process events
         sf::Event e;
         while (m_win.pollEvent(e)) {
+            // Process imgui events
+            ImGui::SFML::ProcessEvent(e);
+
             if (e.type == sf::Event::Closed) {
                 m_win.close();
+            } else if (e.type == sf::Event::KeyPressed) {
+                if (e.key.code == sf::Keyboard::Tilde) {
+                    // Draw console with tide
+                    m_drawConsole = !m_drawConsole;
+                }
             }
+        }
+
+        ImGui::SFML::Update(m_win, m_delta.restart()); // Update imgui
+        // Draw gui here
+        if (m_drawConsole) {
+            ImGui::Begin("Console");
+            std::string s = m_logData.str();
+            ImGui::TextUnformatted(s.c_str());
+            ImGui::End();
         }
 
         // Draw
@@ -149,6 +176,8 @@ void Game::execute() {
         m_win.draw(grass);
         m_win.draw(sand);
         m_win.draw(sky);
+        // Draw imgui
+        ImGui::SFML::Render(m_win);
         m_win.display();
     }
 }

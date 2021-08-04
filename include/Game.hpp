@@ -18,6 +18,10 @@
 #include <TextureAtlas.hpp>
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/ostream_sink.h>
+#include <sstream>
+#include <memory>
 
 namespace nc {
 
@@ -42,6 +46,11 @@ private:
     int m_argc;
     char** m_argv;
     nlohmann::json m_settings;
+    sf::Clock m_delta; // Delta time clock
+    bool m_drawConsole;
+    std::ostringstream m_logData; // Log data stream
+    std::shared_ptr<spdlog::sinks::ostream_sink_mt> m_sink; // Log sink
+    std::shared_ptr<spdlog::logger> m_logger; // Logger
 
     sf::RenderWindow m_win; // Game window
 };

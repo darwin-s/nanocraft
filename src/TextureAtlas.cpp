@@ -14,6 +14,7 @@
 
 #include <TextureAtlas.hpp>
 #include <physfs.h>
+#include <spdlog/spdlog.h>
 #include <cassert>
 
 namespace {
@@ -40,22 +41,30 @@ TextureAtlas::TextureAtlas(unsigned int tileSize) : m_tileSize(tileSize) {
 bool TextureAtlas::addTexture(const std::filesystem::path& path) {
     bool couldLoad          = true;
     PHYSFS_File* fileHandle = PHYSFS_openRead(path.string().c_str());
+    PHYSFS_sint64 fileSize;
+    PHYSFS_sint64 read;
+    unsigned char* fileData = nullptr;
     if (fileHandle == NULL) {
-        // TODO log physfs error
+        spdlog::warn("Could not open texture {}!", path.string());
+        spdlog::warn("Using default texture!");
         couldLoad = false;
+    } else {
+        fileSize = PHYSFS_fileLength(fileHandle);
+        if (fileSize == -1) {
+            spdlog::warn("Could not retreive file size for texture {}!",
+                         path.string());
+            spdlog::warn("Using default texture!");
+            couldLoad = false;
+        }
+        fileData = new unsigned char[fileSize];
+        read     = PHYSFS_readBytes(fileHandle, fileData, fileSize);
+        if (read < fileSize && couldLoad) {
+            spdlog::warn("Could not read texture {}!", path.string());
+            spdlog::warn("Using default texture!");
+            couldLoad = false;
+        }
+        PHYSFS_close(fileHandle);
     }
-    PHYSFS_sint64 fileSize = PHYSFS_fileLength(fileHandle);
-    if (fileSize == -1 && couldLoad) {
-        // TODO log physfs error
-        couldLoad = false;
-    }
-    unsigned char* fileData = new unsigned char[fileSize];
-    PHYSFS_sint64 read      = PHYSFS_readBytes(fileHandle, fileData, fileSize);
-    if (read < fileSize && couldLoad) {
-        // TODO log physfs error
-        couldLoad = false;
-    }
-    PHYSFS_close(fileHandle);
 
     sf::Image img;
     if (couldLoad) {
@@ -68,7 +77,9 @@ bool TextureAtlas::addTexture(const std::filesystem::path& path) {
 
     // Check if texture has the right size
     if (img.getSize().x != m_tileSize || img.getSize().y != m_tileSize) {
-        // TODO log warning
+        spdlog::warn("Wrong size for texture {}!", path.string());
+        spdlog::warn("Expected a {}x{} texture!", m_tileSize, m_tileSize);
+        spdlog::warn("Using default texture!");
         img.create(m_tileSize, m_tileSize, sf::Color::Magenta);
         couldLoad = false;
     }
