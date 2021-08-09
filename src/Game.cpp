@@ -14,9 +14,11 @@
 
 #include <Game.hpp>
 #include <Version.hpp>
+#include <Map.hpp>
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <physfs.h>
+#include <FastNoiseLite.h>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
@@ -32,7 +34,7 @@ Game::Game(int argc, char** argv)
     assert(m_inst == nullptr);
     m_inst = this;
 
-    m_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(m_logData);
+    m_sink   = std::make_shared<spdlog::sinks::ostream_sink_mt>(m_logData);
     m_logger = std::make_shared<spdlog::logger>("nanolog", m_sink);
     m_logger->set_level(spdlog::level::trace);
     spdlog::set_default_logger(m_logger);
@@ -54,6 +56,10 @@ void Game::saveSettings() {
     o.close();
 }
 
+TextureAtlas& Game::getTextureAtlas() {
+    return m_atlas;
+}
+
 Game* Game::getInstance() {
     return m_inst;
 }
@@ -62,6 +68,8 @@ void Game::setup() {
     if (!PHYSFS_init(m_argv[0])) {
         throw std::runtime_error("Failed to initialize PHYSFS!");
     }
+
+    sf::err().rdbuf(m_logData.rdbuf());
 
     spdlog::info("Nanocraft v{}.{}.{}.{}", NC_VER_MAJOR, NC_VER_MINOR,
                  NC_VER_PATCH, NC_VER_TWEAK);
@@ -101,9 +109,9 @@ void Game::setup() {
     }
 
     // Create window
-    unsigned int modeWidth =
+    auto modeWidth =
         m_settings["display"]["resolution_x"].get<unsigned int>();
-    unsigned int modeHeight =
+    auto modeHeight =
         m_settings["display"]["resolution_y"].get<unsigned int>();
     sf::Uint32 windowStyle =
         sf::Style::Titlebar | sf::Style::Close; // Default window style
@@ -113,37 +121,36 @@ void Game::setup() {
         windowStyle = sf::Style::None;
     }
 
+    float aspectRatio = static_cast<float>(modeWidth) / static_cast<float>(modeHeight);
+
+    m_camera.reset(sf::FloatRect(0.0f, 0.0f,
+                                       static_cast<float>(Chunk::CHUNK_SIZE),
+                                       static_cast<float>(Chunk::CHUNK_SIZE) / aspectRatio));
+
     m_win.create(sf::VideoMode(modeWidth, modeHeight), "Nanocraft",
                  windowStyle);
+    m_win.setView(m_camera);
 
     ImGui::SFML::Init(m_win);
     ImGui::GetIO().IniFilename = nullptr;
 }
 
 void Game::execute() {
-    TextureAtlas ta;
-    ta.addTexture("grass.png");
-    ta.addTexture("sand.png");
-    ta.addTexture("skys.png");
+    if (!m_atlas.addTexture("grass.png")) {
+        spdlog::error("Could not load texture grass.png!");
+    }
+    if (!m_atlas.addTexture("sand.png")) {
+        spdlog::error("Could not load texture sand.png!");
+    }
+    if (!m_atlas.addTexture("sky.png")) {
+        spdlog::error("Could not load texture sky.png!");
+    }
 
-    TextureAtlas::TextureInfo grassTex = ta.getTexture("grass.png");
-    TextureAtlas::TextureInfo sandTex  = ta.getTexture("sand.png");
-    TextureAtlas::TextureInfo skyTex   = ta.getTexture("skys.png");
+    Map map(m_settings["debug"]["test_seed"].get<unsigned int>());
+    map.generateChunk(0, 0);
 
-    sf::Sprite grass;
-    sf::Sprite sand;
-    sf::Sprite sky;
-
-    grass.setTexture(*grassTex.texture);
-    sand.setTexture(*sandTex.texture);
-    sky.setTexture(*skyTex.texture);
-
-    grass.setTextureRect(grassTex.textureRect);
-    sand.setTextureRect(sandTex.textureRect);
-    sky.setTextureRect(skyTex.textureRect);
-
-    sand.move(32.0f, 0.0f);
-    sky.move(64.0f, 0.0f);
+    // TODO remove this
+    Chunk* c1 = map.getChunk(0, 0);
 
     while (m_win.isOpen()) {
         // Process events
@@ -172,11 +179,9 @@ void Game::execute() {
         }
 
         // Draw
-        m_win.clear();
-        m_win.draw(grass);
-        m_win.draw(sand);
-        m_win.draw(sky);
+        m_win.draw(*c1);
         // Draw imgui
+        ImGui::EndFrame();
         ImGui::SFML::Render(m_win);
         m_win.display();
     }
@@ -194,9 +199,11 @@ void Game::loadSettings() {
 void Game::createDefaultSettings() {
     m_settings.clear();
     // Display settings
-    m_settings["display"]["resolution_x"] = 640;
-    m_settings["display"]["resolution_y"] = 480;
+    m_settings["display"]["resolution_x"] = 1280;
+    m_settings["display"]["resolution_y"] = 720;
     m_settings["display"]["window_type"]  = "window";
+    // Debug settings
+    m_settings["debug"]["test_seed"] = 7582;
 }
 
 }

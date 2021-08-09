@@ -7,18 +7,25 @@ set(NC_GENERATED
 
 set(NC_INCLUDES 
     ../include/Game.hpp
-    ../include/TextureAtlas.hpp)
+    ../include/TextureAtlas.hpp
+    ../include/Map.hpp
+    ../include/Tile.hpp
+    ../include/Chunk.hpp)
 
 set(NC_SOURCES
     ${imgui_sfml_src}
     main.cpp
     Game.cpp
-    TextureAtlas.cpp)
+    TextureAtlas.cpp
+    Map.cpp
+    Tile.cpp
+    Chunk.cpp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system network window audio graphics REQUIRED)
 add_executable(nanocraft WIN32 ${NC_SOURCES} ${NC_INCLUDES} ${NC_GENERATED})
-target_link_libraries(nanocraft PUBLIC 
+target_link_libraries(nanocraft PUBLIC
+    fastnoiselite
     spdlog 
     imgui-sfml 
     json 

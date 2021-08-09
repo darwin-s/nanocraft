@@ -608,3 +608,5 @@ $RECYCLE.BIN/
 build
 out
 .vsocde
+cmake-build-*
+CMakeSettings.json

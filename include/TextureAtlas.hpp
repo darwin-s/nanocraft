@@ -34,11 +34,13 @@ public:
 public:
     static constexpr unsigned int MAX_TEXTURES = 16;
     static constexpr unsigned int DEFAULT_TILE_SIZE = 32;
+    static constexpr unsigned int PAGE_SIZE = 1024;
 
 public:
     explicit TextureAtlas(unsigned int tileSize = DEFAULT_TILE_SIZE);
     bool addTexture(const std::filesystem::path& path);
     TextureInfo getTexture(const std::string& texture) const;
+    unsigned int getTileSize() const;
 
 private:
     struct AtlasPage {

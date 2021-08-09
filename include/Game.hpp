@@ -31,6 +31,7 @@ public:
     void run();
     const nlohmann::json& getSettings() const;
     void saveSettings();
+    TextureAtlas& getTextureAtlas();
 
     static Game* getInstance();
 
@@ -51,8 +52,10 @@ private:
     std::ostringstream m_logData; // Log data stream
     std::shared_ptr<spdlog::sinks::ostream_sink_mt> m_sink; // Log sink
     std::shared_ptr<spdlog::logger> m_logger; // Logger
+    TextureAtlas m_atlas; // Texture atlas
 
     sf::RenderWindow m_win; // Game window
+    sf::View m_camera; // Main camera
 };
 
 }

@@ -17,19 +17,9 @@
 #include <spdlog/spdlog.h>
 #include <cassert>
 
-namespace {
-
-unsigned int PAGE_SIZE = 0;
-
-}
-
 namespace nc {
 
 TextureAtlas::TextureAtlas(unsigned int tileSize) : m_tileSize(tileSize) {
-    if (PAGE_SIZE == 0) {
-        PAGE_SIZE = sf::Texture::getMaximumSize();
-    }
-
     AtlasPage& p1 = m_textures[0];
 
     p1.xFreeOffset = 0;
@@ -143,6 +133,10 @@ TextureAtlas::TextureInfo
     TextureAtlas::getTexture(const std::string& texture) const {
     assert(m_texInfo.find(texture) != m_texInfo.end());
     return m_texInfo.at(texture);
+}
+
+unsigned int TextureAtlas::getTileSize() const {
+    return m_tileSize;
 }
 
 }

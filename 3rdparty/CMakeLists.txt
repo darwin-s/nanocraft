@@ -14,3 +14,5 @@ set(imgui_sfml_src
     PARENT_SCOPE)
 add_library(spdlog INTERFACE)
 target_include_directories(spdlog INTERFACE spdlog/include)
+add_library(fastnoiselite INTERFACE)
+target_include_directories(fastnoiselite INTERFACE fastnoiselite)
