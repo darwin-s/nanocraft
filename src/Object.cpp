@@ -12,29 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <Tile.hpp>
+#include <Object.hpp>
 #include <Game.hpp>
 
 namespace nc {
 
-Tile::Tile() : sf::Sprite() {
+Object::Object(sf::Vector2u size) : m_size(size), sf::Sprite() {
     setTexture("default");
+    setSize(m_size);
 }
 
-Tile::Tile(const std::string& texture) : sf::Sprite() {
+Object::Object(const std::string& texture, sf::Vector2u size)
+    : m_size(size), sf::Sprite() {
     setTexture(texture);
+    setSize(m_size);
 }
 
-void Tile::setTexture(const std::string& texture) {
-    TextureAtlas::TextureInfo inf = Game::getInstance()->getTextureAtlas().getTexture(texture);
+void Object::setTexture(const std::string& texture) {
+    TextureAtlas::TextureInfo inf =
+        Game::getInstance()->getTextureAtlas().getTexture(texture);
     sf::Sprite::setTexture(*inf.texture);
     sf::Sprite::setTextureRect(inf.textureRect);
-    m_size = Game::getInstance()->getTextureAtlas().getTileSize();
-    sf::Sprite::setScale(1.0f/static_cast<float>(m_size), 1.0f/static_cast<float>(m_size));
 }
 
-unsigned int Tile::getSize() const {
+sf::Vector2u Object::getSize() const {
     return m_size;
+}
+
+void Object::setSize(sf::Vector2u size) {
+    m_size = size;
+    const unsigned int tileSize =
+        Game::getInstance()->getTextureAtlas().getTileSize();
+    sf::Sprite::setScale(
+        static_cast<float>(m_size.x) / static_cast<float>(tileSize),
+        static_cast<float>(m_size.y) / static_cast<float>(tileSize));
 }
 
 }

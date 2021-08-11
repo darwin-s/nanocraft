@@ -16,10 +16,12 @@
 #define NC_GAME_HPP
 
 #include <TextureAtlas.hpp>
+#include <Map.hpp>
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/ostream_sink.h>
+#include <entt/entt.hpp>
 #include <sstream>
 #include <memory>
 
@@ -27,11 +29,15 @@ namespace nc {
 
 class Game {
 public:
+    static constexpr float MAX_DT = 1.0f / 60.0f;
+
+public:
     Game(int argc, char** argv);
     void run();
     const nlohmann::json& getSettings() const;
     void saveSettings();
     TextureAtlas& getTextureAtlas();
+    entt::registry& getRegistry();
 
     static Game* getInstance();
 
@@ -46,16 +52,25 @@ private:
 
     int m_argc;
     char** m_argv;
-    nlohmann::json m_settings;
-    sf::Clock m_delta; // Delta time clock
     bool m_drawConsole;
+
+    nlohmann::json m_settings;
+    
     std::ostringstream m_logData; // Log data stream
     std::shared_ptr<spdlog::sinks::ostream_sink_mt> m_sink; // Log sink
     std::shared_ptr<spdlog::logger> m_logger; // Logger
+
+    sf::Clock m_delta; // Delta time clock
     TextureAtlas m_atlas; // Texture atlas
 
     sf::RenderWindow m_win; // Game window
-    sf::View m_camera; // Main camera
+    sf::View m_view; // Main camera
+
+    entt::entity m_player;
+    entt::entity m_camera;
+    entt::registry m_registry;
+
+    Map* m_map;
 };
 
 }

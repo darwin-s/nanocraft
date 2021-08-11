@@ -12,25 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NANOCRAFT_TILE_HPP
-#define NANOCRAFT_TILE_HPP
+#ifndef NANOCRAFT_OBJECT_HPP
+#define NANOCRAFT_OBJECT_HPP
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <string>
 
 namespace nc {
 
-class Tile : public sf::Sprite {
+class Object : public sf::Sprite {
 public:
-    Tile();
-    explicit Tile(const std::string& texture);
+    explicit Object(sf::Vector2u size = sf::Vector2u(1, 1));
+    explicit Object(const std::string& texture, sf::Vector2u size = sf::Vector2u(1, 1));
     void setTexture(const std::string& texture);
-    unsigned int getSize() const;
+    sf::Vector2u getSize() const;
+    void setSize(sf::Vector2u size);
 
 private:
-    unsigned int m_size;
+    sf::Vector2u m_size;
 };
 
 }
 
-#endif // !NANOCRAFT_TILE_HPP
+#endif // !NANOCRAFT_OBJECT_HPP

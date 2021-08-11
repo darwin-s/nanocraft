@@ -24,7 +24,7 @@ namespace nc {
 class Map {
 public:
     static constexpr unsigned int CHUNK_NO = 1024;
-    static constexpr float FREQ = 0.02f;
+    static constexpr float FREQ = 0.04f;
     static constexpr unsigned long WORLD_SIZE = CHUNK_NO * Chunk::CHUNK_SIZE;
     static constexpr unsigned int OCTAVES = 8;
 

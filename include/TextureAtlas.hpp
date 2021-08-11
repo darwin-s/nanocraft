@@ -15,7 +15,8 @@
 #ifndef NC_TEXTUREATLAS_HPP
 #define NC_TEXTUREATLAS_HPP
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <array>
 #include <unordered_map>
 #include <filesystem>

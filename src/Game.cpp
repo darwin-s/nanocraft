@@ -15,15 +15,21 @@
 #include <Game.hpp>
 #include <Version.hpp>
 #include <Map.hpp>
+#include <Object.hpp>
+#include <InputHandler.hpp>
+#include <PlayerInputComponent.hpp>
+#include <PlayerComponent.hpp>
+#include <VelocityComponent.hpp>
+#include <Physics.hpp>
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <physfs.h>
-#include <FastNoiseLite.h>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <cassert>
 #include <stdexcept>
+#include <algorithm>
 
 namespace nc {
 
@@ -58,6 +64,10 @@ void Game::saveSettings() {
 
 TextureAtlas& Game::getTextureAtlas() {
     return m_atlas;
+}
+
+entt::registry& Game::getRegistry() {
+    return m_registry;
 }
 
 Game* Game::getInstance() {
@@ -109,10 +119,8 @@ void Game::setup() {
     }
 
     // Create window
-    auto modeWidth =
-        m_settings["display"]["resolution_x"].get<unsigned int>();
-    auto modeHeight =
-        m_settings["display"]["resolution_y"].get<unsigned int>();
+    auto modeWidth  = m_settings["display"]["resolution_x"].get<unsigned int>();
+    auto modeHeight = m_settings["display"]["resolution_y"].get<unsigned int>();
     sf::Uint32 windowStyle =
         sf::Style::Titlebar | sf::Style::Close; // Default window style
     if (m_settings["display"]["window_type"] == "fullscreen") {
@@ -121,21 +129,23 @@ void Game::setup() {
         windowStyle = sf::Style::None;
     }
 
-    float aspectRatio = static_cast<float>(modeWidth) / static_cast<float>(modeHeight);
+    float aspectRatio =
+        static_cast<float>(modeWidth) / static_cast<float>(modeHeight);
 
-    m_camera.reset(sf::FloatRect(0.0f, 0.0f,
-                                       static_cast<float>(Chunk::CHUNK_SIZE),
-                                       static_cast<float>(Chunk::CHUNK_SIZE) / aspectRatio));
+    m_view.reset(
+        sf::FloatRect(0.0f, 0.0f, static_cast<float>(Chunk::CHUNK_SIZE),
+                      static_cast<float>(Chunk::CHUNK_SIZE) / aspectRatio));
 
     m_win.create(sf::VideoMode(modeWidth, modeHeight), "Nanocraft",
                  windowStyle);
-    m_win.setView(m_camera);
+    m_win.setView(m_view);
 
     ImGui::SFML::Init(m_win);
     ImGui::GetIO().IniFilename = nullptr;
 }
 
 void Game::execute() {
+    // TODO: Remove test stuff
     if (!m_atlas.addTexture("grass.png")) {
         spdlog::error("Could not load texture grass.png!");
     }
@@ -146,13 +156,105 @@ void Game::execute() {
         spdlog::error("Could not load texture sky.png!");
     }
 
-    Map map(m_settings["debug"]["test_seed"].get<unsigned int>());
-    map.generateChunk(0, 0);
+    m_map = new Map(m_settings["debug"]["test_seed"].get<unsigned int>());
+    m_map->generateChunk(512, 512);
+
+    m_player = m_registry.create();
+    m_camera = m_registry.create();
+    m_registry.emplace<Object>(m_player, "player.png");
+    m_registry.emplace<PlayerComponent>(m_player);
+    m_registry.emplace<PlayerInputComponent>(m_player);
+    m_registry.emplace<VelocityComponent>(m_player);
+    m_registry.emplace<sf::View*>(m_player, &m_view);
+    m_registry.emplace<sf::View*>(m_camera, &m_view);
+    m_registry.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
+    m_registry.get<Object>(m_player).setPosition(
+        sf::Vector2f(16400.0f, 16400.0f));
+    m_view.setCenter(16400.0f, 16400.0f);
 
     // TODO remove this
-    Chunk* c1 = map.getChunk(0, 0);
+    Chunk* c0 = nullptr;
+    Chunk* c1 = nullptr;
+    Chunk* c2 = nullptr;
+    Chunk* c3 = nullptr;
+    Chunk* c4 = nullptr;
+    Chunk* c5 = nullptr;
+    Chunk* c6 = nullptr;
+    Chunk* c7 = nullptr;
+    Chunk* c8 = nullptr;
+    
+    sf::Clock frameTime;
+    float fps = 0.0f;
 
     while (m_win.isOpen()) {
+        // Get delta time
+        float elapsed = m_delta.restart().asSeconds();
+
+        // Poll inputs
+        InputHandler::pollInput(m_registry);
+
+        // TODO: remove
+        Object& player = m_registry.get<Object>(m_player);
+        unsigned int chunkX = static_cast<unsigned int>(player.getPosition().x /
+                                                        Chunk::CHUNK_SIZE);
+        unsigned int chunkY = static_cast<unsigned int>(player.getPosition().y /
+                                                        Chunk::CHUNK_SIZE);
+
+        c0 = m_map->getChunk(chunkX, chunkY);
+        c1 = m_map->getChunk(chunkX - 1, chunkY - 1);
+        c2 = m_map->getChunk(chunkX, chunkY - 1);
+        c3 = m_map->getChunk(chunkX + 1, chunkY - 1);
+        c4 = m_map->getChunk(chunkX - 1, chunkY);
+        c5 = m_map->getChunk(chunkX + 1, chunkY);
+        c6 = m_map->getChunk(chunkX - 1, chunkY + 1);
+        c7 = m_map->getChunk(chunkX, chunkY + 1);
+        c8 = m_map->getChunk(chunkX + 1, chunkY + 1);
+
+        if (c0 == nullptr) {
+            m_map->generateChunk(chunkX, chunkY);
+            c0 = m_map->getChunk(chunkX, chunkY);
+        }
+
+        if (c1 == nullptr) {
+            m_map->generateChunk(chunkX - 1, chunkY - 1);
+            c1 = m_map->getChunk(chunkX - 1, chunkY - 1);
+        }
+
+        if (c2 == nullptr) {
+            m_map->generateChunk(chunkX, chunkY - 1);
+            c2 = m_map->getChunk(chunkX, chunkY - 1);
+        }
+
+        if (c3 == nullptr) {
+            m_map->generateChunk(chunkX + 1, chunkY - 1);
+            c3 = m_map->getChunk(chunkX + 1, chunkY - 1);
+        }
+
+        if (c4 == nullptr) {
+            m_map->generateChunk(chunkX - 1, chunkY);
+            c4 = m_map->getChunk(chunkX - 1, chunkY);
+        }
+
+        if (c5 == nullptr) {
+            m_map->generateChunk(chunkX + 1, chunkY);
+            c5 = m_map->getChunk(chunkX + 1, chunkY);
+        }
+
+        if (c6 == nullptr) {
+            m_map->generateChunk(chunkX - 1, chunkY + 1);
+            c6 = m_map->getChunk(chunkX - 1, chunkY + 1);
+        }
+
+        if (c7 == nullptr) {
+            m_map->generateChunk(chunkX, chunkY + 1);
+            c7 = m_map->getChunk(chunkX, chunkY + 1);
+        }
+
+        if (c8 == nullptr) {
+            m_map->generateChunk(chunkX + 1, chunkY + 1);
+            c8 = m_map->getChunk(chunkX + 1, chunkY + 1);
+        }
+
         // Process events
         sf::Event e;
         while (m_win.pollEvent(e)) {
@@ -162,28 +264,60 @@ void Game::execute() {
             if (e.type == sf::Event::Closed) {
                 m_win.close();
             } else if (e.type == sf::Event::KeyPressed) {
-                if (e.key.code == sf::Keyboard::Tilde) {
-                    // Draw console with tide
+                if (e.key.code == m_settings["controls"]["toggle_console"]
+                                      .get<sf::Keyboard::Key>()) {
+                    // Draw console with tilde
                     m_drawConsole = !m_drawConsole;
                 }
             }
+
+            InputHandler::handleInput(e, m_registry);
         }
 
-        ImGui::SFML::Update(m_win, m_delta.restart()); // Update imgui
+        // Update imgui
+        ImGui::SFML::Update(m_win, sf::seconds(elapsed));
+
+        // Update with semi fixed timestep
+        while (elapsed > 0.0f) {
+            // Calculate dt
+            const float dt = std::min(elapsed, MAX_DT);
+            // Simulate physics
+            Physics::simulate(m_registry, dt);
+            m_view.setCenter(player.getPosition());
+
+            elapsed -= dt;
+        }
+
         // Draw gui here
         if (m_drawConsole) {
             ImGui::Begin("Console");
             std::string s = m_logData.str();
             ImGui::TextUnformatted(s.c_str());
             ImGui::End();
+            // Draw performance window
+            ImGui::Begin("Performance");
+            ImGui::Text("FPS: %.2f", fps);
+            ImGui::End();
         }
 
         // Draw
+        m_win.setView(m_view);
+        m_win.draw(*c0);
         m_win.draw(*c1);
+        m_win.draw(*c2);
+        m_win.draw(*c3);
+        m_win.draw(*c4);
+        m_win.draw(*c5);
+        m_win.draw(*c6);
+        m_win.draw(*c7);
+        m_win.draw(*c8);
+        m_win.draw(m_registry.get<Object>(m_player));
         // Draw imgui
         ImGui::EndFrame();
         ImGui::SFML::Render(m_win);
         m_win.display();
+
+        fps = 1.0f / frameTime.restart().asSeconds();
     }
 }
 
@@ -202,6 +336,12 @@ void Game::createDefaultSettings() {
     m_settings["display"]["resolution_x"] = 1280;
     m_settings["display"]["resolution_y"] = 720;
     m_settings["display"]["window_type"]  = "window";
+    // Control settings
+    m_settings["controls"]["toggle_console"] = sf::Keyboard::Tilde;
+    m_settings["controls"]["move_up"]        = sf::Keyboard::W;
+    m_settings["controls"]["move_down"]      = sf::Keyboard::S;
+    m_settings["controls"]["move_left"]      = sf::Keyboard::A;
+    m_settings["controls"]["move_right"]     = sf::Keyboard::D;
     // Debug settings
     m_settings["debug"]["test_seed"] = 7582;
 }
