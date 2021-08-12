@@ -13,9 +13,31 @@
 // limitations under the License.
 
 #include <Map.hpp>
+#include <PlayerComponent.hpp>
+#include <Object.hpp>
 #include <random>
+#include <array>
 
 namespace nc {
+
+sf::Vector2u Map::getChunkPos(float x, float y) {
+    return sf::Vector2u(static_cast<unsigned int>(x / Chunk::CHUNK_SIZE),
+                        static_cast<unsigned int>(y / Chunk::CHUNK_SIZE));
+}
+
+sf::Vector2u Map::getChunkPos(sf::Vector2f pos) {
+    return getChunkPos(pos.x, pos.y);
+}
+
+sf::Vector2f Map::getGlobalPos(unsigned int chunkX, unsigned int chunkY,
+                               unsigned int tileX, unsigned int tileY) {
+    return sf::Vector2f(static_cast<float>(chunkX * Chunk::CHUNK_SIZE + tileX),
+                        static_cast<float>(chunkY * Chunk::CHUNK_SIZE + tileY));
+}
+
+sf::Vector2f Map::getGlobalPos(sf::Vector2u chunkPos, sf::Vector2u tilePos) {
+    return getGlobalPos(chunkPos.x, chunkPos.y, tilePos.x, tilePos.y);
+}
 
 Map::Map() : m_seed(std::default_random_engine::default_seed) {
     m_noiseGen.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
@@ -62,13 +84,17 @@ Chunk* Map::getChunk(const unsigned int x, const unsigned int y) {
     return m_chunks[y][x];
 }
 
+Chunk* Map::getChunk(const sf::Vector2u pos) {
+    return getChunk(pos.x, pos.y);
+}
+
 void Map::generateChunk(unsigned int x, unsigned int y) {
     m_chunks[y][x] = new Chunk(x, y);
     for (unsigned int yTile = 0; yTile < Chunk::CHUNK_SIZE; yTile++) {
         for (unsigned int xTile = 0; xTile < Chunk::CHUNK_SIZE; xTile++) {
             const float globalXpos = x * Chunk::CHUNK_SIZE + xTile;
             const float globalYpos = y * Chunk::CHUNK_SIZE + yTile;
-            const float val        = m_noiseGen.GetNoise(globalXpos, globalYpos);
+            const float val = m_noiseGen.GetNoise(globalXpos, globalYpos);
             if (val < 0.0f) {
                 m_chunks[y][x]->getTile(xTile, yTile).setTexture("sand.png");
             } else {
@@ -78,8 +104,35 @@ void Map::generateChunk(unsigned int x, unsigned int y) {
     }
 }
 
+void Map::generateChunk(const sf::Vector2u pos) {
+    generateChunk(pos.x, pos.y);
+}
+
 std::uint32_t Map::getSeed() const {
     return m_seed;
+}
+
+entt::registry& Map::getRegistry() {
+    return m_reg;
+}
+
+void Map::simulateWorld(float dt) {
+    // Generate chunks around players
+    m_reg.view<PlayerComponent, Object>().each([=](auto& obj) {
+        constexpr int xDir[] = {0, -1, 0, 1, -1, 1, -1, 0, 1};
+        constexpr int yDir[] = {0, -1, -1, -1, 0, 0, 1, 1, 1};
+
+        for (int i = 0; i < 9; i++) {
+            const unsigned int xPos =
+                getChunkPos(obj.getPosition()).x + xDir[i];
+            const unsigned int yPos =
+                getChunkPos(obj.getPosition()).y + yDir[i];
+
+            if (getChunk(xPos, yPos) == nullptr) {
+                generateChunk(xPos, yPos);
+            }
+        }
+    });
 }
 
 }

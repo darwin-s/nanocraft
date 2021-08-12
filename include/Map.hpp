@@ -18,28 +18,43 @@
 #include <Chunk.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <FastNoiseLite.h>
+#include <entt/entt.hpp>
 
 namespace nc {
 
 class Map {
 public:
-    static constexpr unsigned int CHUNK_NO = 1024;
-    static constexpr float FREQ = 0.04f;
+    static constexpr unsigned int CHUNK_NO    = 1024;
+    static constexpr float FREQ               = 0.04f;
     static constexpr unsigned long WORLD_SIZE = CHUNK_NO * Chunk::CHUNK_SIZE;
-    static constexpr unsigned int OCTAVES = 8;
+    static constexpr unsigned int OCTAVES     = 8;
+
+public:
+    static sf::Vector2u getChunkPos(float x, float y);
+    static sf::Vector2u getChunkPos(sf::Vector2f pos);
+    static sf::Vector2f getGlobalPos(unsigned int chunkX, unsigned int chunkY,
+                                     unsigned int tileX = 0,
+                                     unsigned int tileY = 0);
+    static sf::Vector2f getGlobalPos(sf::Vector2u chunkPos,
+                                     sf::Vector2u tilePos = sf::Vector2u(0, 0));
 
 public:
     Map();
     explicit Map(std::uint32_t seed);
     ~Map();
     Chunk* getChunk(unsigned int x, unsigned int y);
+    Chunk* getChunk(sf::Vector2u pos);
     void generateChunk(unsigned int x, unsigned int y);
-    std::uint32_t getSeed() const;
+    void generateChunk(sf::Vector2u pos);
+    [[nodiscard]] std::uint32_t getSeed() const;
+    entt::registry& getRegistry();
+    void simulateWorld([[maybe_unused]] float dt);
 
 private:
     Chunk*** m_chunks;
     FastNoiseLite m_noiseGen;
     std::uint32_t m_seed;
+    entt::registry m_reg;
 };
 
 }

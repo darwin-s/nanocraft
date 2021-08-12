@@ -37,7 +37,6 @@ public:
     const nlohmann::json& getSettings() const;
     void saveSettings();
     TextureAtlas& getTextureAtlas();
-    entt::registry& getRegistry();
 
     static Game* getInstance();
 
@@ -67,8 +66,6 @@ private:
     sf::View m_view; // Main camera
 
     entt::entity m_player;
-    entt::entity m_camera;
-    entt::registry m_registry;
 
     Map* m_map;
 };

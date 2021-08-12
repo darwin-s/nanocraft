@@ -66,10 +66,6 @@ TextureAtlas& Game::getTextureAtlas() {
     return m_atlas;
 }
 
-entt::registry& Game::getRegistry() {
-    return m_registry;
-}
-
 Game* Game::getInstance() {
     return m_inst;
 }
@@ -159,14 +155,13 @@ void Game::execute() {
     m_map = new Map(m_settings["debug"]["test_seed"].get<unsigned int>());
     m_map->generateChunk(512, 512);
 
+    entt::registry& m_registry = m_map->getRegistry();
     m_player = m_registry.create();
-    m_camera = m_registry.create();
     m_registry.emplace<Object>(m_player, "player.png");
     m_registry.emplace<PlayerComponent>(m_player);
     m_registry.emplace<PlayerInputComponent>(m_player);
     m_registry.emplace<VelocityComponent>(m_player);
     m_registry.emplace<sf::View*>(m_player, &m_view);
-    m_registry.emplace<sf::View*>(m_camera, &m_view);
     m_registry.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
     m_registry.get<Object>(m_player).setPosition(
         sf::Vector2f(16400.0f, 16400.0f));
@@ -184,6 +179,7 @@ void Game::execute() {
     Chunk* c8 = nullptr;
     
     sf::Clock frameTime;
+    sf::Clock updateFpsTimer;
     float fps = 0.0f;
 
     while (m_win.isOpen()) {
@@ -195,65 +191,8 @@ void Game::execute() {
 
         // TODO: remove
         Object& player = m_registry.get<Object>(m_player);
-        unsigned int chunkX = static_cast<unsigned int>(player.getPosition().x /
-                                                        Chunk::CHUNK_SIZE);
-        unsigned int chunkY = static_cast<unsigned int>(player.getPosition().y /
-                                                        Chunk::CHUNK_SIZE);
-
-        c0 = m_map->getChunk(chunkX, chunkY);
-        c1 = m_map->getChunk(chunkX - 1, chunkY - 1);
-        c2 = m_map->getChunk(chunkX, chunkY - 1);
-        c3 = m_map->getChunk(chunkX + 1, chunkY - 1);
-        c4 = m_map->getChunk(chunkX - 1, chunkY);
-        c5 = m_map->getChunk(chunkX + 1, chunkY);
-        c6 = m_map->getChunk(chunkX - 1, chunkY + 1);
-        c7 = m_map->getChunk(chunkX, chunkY + 1);
-        c8 = m_map->getChunk(chunkX + 1, chunkY + 1);
-
-        if (c0 == nullptr) {
-            m_map->generateChunk(chunkX, chunkY);
-            c0 = m_map->getChunk(chunkX, chunkY);
-        }
-
-        if (c1 == nullptr) {
-            m_map->generateChunk(chunkX - 1, chunkY - 1);
-            c1 = m_map->getChunk(chunkX - 1, chunkY - 1);
-        }
-
-        if (c2 == nullptr) {
-            m_map->generateChunk(chunkX, chunkY - 1);
-            c2 = m_map->getChunk(chunkX, chunkY - 1);
-        }
-
-        if (c3 == nullptr) {
-            m_map->generateChunk(chunkX + 1, chunkY - 1);
-            c3 = m_map->getChunk(chunkX + 1, chunkY - 1);
-        }
-
-        if (c4 == nullptr) {
-            m_map->generateChunk(chunkX - 1, chunkY);
-            c4 = m_map->getChunk(chunkX - 1, chunkY);
-        }
-
-        if (c5 == nullptr) {
-            m_map->generateChunk(chunkX + 1, chunkY);
-            c5 = m_map->getChunk(chunkX + 1, chunkY);
-        }
-
-        if (c6 == nullptr) {
-            m_map->generateChunk(chunkX - 1, chunkY + 1);
-            c6 = m_map->getChunk(chunkX - 1, chunkY + 1);
-        }
-
-        if (c7 == nullptr) {
-            m_map->generateChunk(chunkX, chunkY + 1);
-            c7 = m_map->getChunk(chunkX, chunkY + 1);
-        }
-
-        if (c8 == nullptr) {
-            m_map->generateChunk(chunkX + 1, chunkY + 1);
-            c8 = m_map->getChunk(chunkX + 1, chunkY + 1);
-        }
+        unsigned int chunkX = Map::getChunkPos(player.getPosition()).x;
+        unsigned int chunkY = Map::getChunkPos(player.getPosition()).y;
 
         // Process events
         sf::Event e;
@@ -283,10 +222,21 @@ void Game::execute() {
             const float dt = std::min(elapsed, MAX_DT);
             // Simulate physics
             Physics::simulate(m_registry, dt);
+            m_map->simulateWorld(dt);
             m_view.setCenter(player.getPosition());
 
             elapsed -= dt;
         }
+
+        c0 = m_map->getChunk(chunkX, chunkY);
+        c1 = m_map->getChunk(chunkX - 1, chunkY - 1);
+        c2 = m_map->getChunk(chunkX, chunkY - 1);
+        c3 = m_map->getChunk(chunkX + 1, chunkY - 1);
+        c4 = m_map->getChunk(chunkX - 1, chunkY);
+        c5 = m_map->getChunk(chunkX + 1, chunkY);
+        c6 = m_map->getChunk(chunkX - 1, chunkY + 1);
+        c7 = m_map->getChunk(chunkX, chunkY + 1);
+        c8 = m_map->getChunk(chunkX + 1, chunkY + 1);
 
         // Draw gui here
         if (m_drawConsole) {
@@ -317,7 +267,12 @@ void Game::execute() {
         ImGui::SFML::Render(m_win);
         m_win.display();
 
-        fps = 1.0f / frameTime.restart().asSeconds();
+        if (updateFpsTimer.getElapsedTime().asSeconds() >= 2.0f) {
+            fps = 1.0f / frameTime.restart().asSeconds();
+            updateFpsTimer.restart();
+        } else {
+            frameTime.restart();
+        }
     }
 }
 
