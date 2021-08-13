@@ -249,7 +249,7 @@ void Game::execute() {
             ImGui::Begin("Performance");
             ImGui::Text("FPS: %.2f", fps);
             ImGui::Text("Player X: %f", m_registry.get<Object>(m_player).getPosition().x);
-            ImGui::Text("Player Y: %f", m_registry.get<Object>(m_player).getPosition().x);
+            ImGui::Text("Player Y: %f", m_registry.get<Object>(m_player).getPosition().y);
             ImGui::Text("DT: %f", std::min(elapsed, MAX_DT));
             ImGui::End();
         }
