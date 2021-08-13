@@ -29,7 +29,7 @@ namespace nc {
 
 class Game {
 public:
-    static constexpr float MAX_DT = 1.0f / 60.0f;
+    static constexpr float TIMESTEP = 1.0f / 60.0f;
 
 public:
     Game(int argc, char** argv);
@@ -37,6 +37,8 @@ public:
     const nlohmann::json& getSettings() const;
     void saveSettings();
     TextureAtlas& getTextureAtlas();
+    void setTimeScale(float scale);
+    float getTimeScale() const;
 
     static Game* getInstance();
 
@@ -64,6 +66,7 @@ private:
 
     sf::RenderWindow m_win; // Game window
     sf::View m_view; // Main camera
+    float m_timeScale; // Game time scale
 
     entt::entity m_player;
 

@@ -36,7 +36,7 @@ namespace nc {
 Game* Game::m_inst = nullptr;
 
 Game::Game(int argc, char** argv)
-    : m_argc(argc), m_argv(argv), m_drawConsole(false) {
+    : m_argc(argc), m_argv(argv), m_drawConsole(false), m_timeScale(1.0f) {
     assert(m_inst == nullptr);
     m_inst = this;
 
@@ -64,6 +64,14 @@ void Game::saveSettings() {
 
 TextureAtlas& Game::getTextureAtlas() {
     return m_atlas;
+}
+
+void Game::setTimeScale(const float scale) {
+    m_timeScale = scale;
+}
+
+float Game::getTimeScale() const {
+    return m_timeScale;
 }
 
 Game* Game::getInstance() {
@@ -182,10 +190,12 @@ void Game::execute() {
     sf::Clock frameTime;
     sf::Clock updateFpsTimer;
     float fps = 0.0f;
+    float accum = 0.0f;
 
     while (m_win.isOpen()) {
         // Get delta time
         float elapsed = m_delta.restart().asSeconds();
+        accum += elapsed;
 
         // Poll inputs
         InputHandler::pollInput(m_registry);
@@ -217,16 +227,16 @@ void Game::execute() {
         // Update imgui
         ImGui::SFML::Update(m_win, sf::seconds(elapsed));
 
-        // Update with semi fixed timestep
-        while (elapsed > 0.0f) {
-            // Calculate dt
-            const float dt = std::min(elapsed, MAX_DT);
+
+        // Simulate physics and world
+        while (accum >= TIMESTEP) {
             // Simulate physics
-            Physics::simulate(m_registry, dt);
-            m_map->simulateWorld(dt);
+            Physics::simulate(m_registry, TIMESTEP * m_timeScale);
+            // Simulate world
+            m_map->simulateWorld(TIMESTEP * m_timeScale);
             m_view.setCenter(player.getPosition());
 
-            elapsed -= dt;
+            accum -= TIMESTEP;
         }
 
         c0 = m_map->getChunk(chunkX, chunkY);
@@ -250,22 +260,39 @@ void Game::execute() {
             ImGui::Text("FPS: %.2f", fps);
             ImGui::Text("Player X: %f", m_registry.get<Object>(m_player).getPosition().x);
             ImGui::Text("Player Y: %f", m_registry.get<Object>(m_player).getPosition().y);
-            ImGui::Text("DT: %f", std::min(elapsed, MAX_DT));
             ImGui::End();
         }
 
         // Draw
         m_win.setView(m_view);
         m_win.clear();
-        m_win.draw(*c0);
-        m_win.draw(*c1);
-        m_win.draw(*c2);
-        m_win.draw(*c3);
-        m_win.draw(*c4);
-        m_win.draw(*c5);
-        m_win.draw(*c6);
-        m_win.draw(*c7);
-        m_win.draw(*c8);
+        if (c0 != nullptr) {
+            m_win.draw(*c0);
+        }
+        if (c1 != nullptr) {
+            m_win.draw(*c1);
+        }
+        if (c2 != nullptr) {
+            m_win.draw(*c2);
+        }
+        if (c3 != nullptr) {
+            m_win.draw(*c3);
+        }
+        if (c4 != nullptr) {
+            m_win.draw(*c4);
+        }
+        if (c5 != nullptr) {
+            m_win.draw(*c5);
+        }
+        if (c6 != nullptr) {
+            m_win.draw(*c6);
+        }
+        if (c7 != nullptr) {
+            m_win.draw(*c7);
+        }
+        if (c8 != nullptr) {
+            m_win.draw(*c8);
+        }
         m_win.draw(m_registry.get<Object>(m_player));
         // Draw imgui
         ImGui::EndFrame();
