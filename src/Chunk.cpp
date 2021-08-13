@@ -13,15 +13,26 @@
 // limitations under the License.
 
 #include <Chunk.hpp>
+#include <Game.hpp>
+#include <Map.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
 namespace nc {
 
 Chunk::Chunk(const unsigned int xPos, const unsigned int yPos)
     : m_xPos(xPos), m_yPos(yPos) {
+    const unsigned int tileSize =
+        Game::getInstance()->getTextureAtlas().getTileSize();
+    m_tex.create(CHUNK_SIZE * tileSize, CHUNK_SIZE * tileSize);
+    m_sprite.setScale(1.0f / static_cast<float>(tileSize),
+                      1.0f / static_cast<float>(tileSize));
+    m_sprite.setPosition(Map::getGlobalPos(xPos, yPos));
+    m_sprite.setTexture(m_tex.getTexture());
+
     for (unsigned int y = 0; y < CHUNK_SIZE; y++) {
         for (unsigned int x = 0; x < CHUNK_SIZE; x++) {
-            m_tiles[y][x].setPosition(static_cast<float>(m_xPos * CHUNK_SIZE + x), static_cast<float>(m_yPos * CHUNK_SIZE + y));
+            m_tiles[y][x].setPosition(static_cast<float>(x * CHUNK_SIZE),
+                                      static_cast<float>(y * CHUNK_SIZE));
         }
     }
 }
@@ -30,12 +41,20 @@ Tile& Chunk::getTile(const unsigned int x, const unsigned int y) {
     return m_tiles[y][x];
 }
 
-void Chunk::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    for (const auto& tileRow : m_tiles) {
-        for (const auto& tile : tileRow) {
-            target.draw(tile, states);
+void Chunk::generateTexture() {
+    m_tex.clear(sf::Color::Yellow);
+    
+    for (auto& tileRow : m_tiles) {
+        for (auto& tile : tileRow) {
+            m_tex.draw(tile);
         }
     }
+    
+    m_tex.display();
+}
+
+void Chunk::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(m_sprite);
 }
 
 }

@@ -17,6 +17,8 @@
 
 #include <Tile.hpp>
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 namespace nc {
 
@@ -27,6 +29,7 @@ public:
 public:
     Chunk(unsigned int xPos, unsigned int yPos);
     Tile& getTile(unsigned int x, unsigned  int y);
+    void generateTexture();
 
 protected:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -35,6 +38,9 @@ private:
     Tile m_tiles[CHUNK_SIZE][CHUNK_SIZE];
     unsigned int m_xPos;
     unsigned int m_yPos;
+
+    sf::RenderTexture m_tex; // Texture of the chunk
+    sf::Sprite m_sprite; // Sprite for the chunk
 };
 
 }

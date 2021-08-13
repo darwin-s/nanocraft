@@ -154,6 +154,7 @@ void Game::execute() {
 
     m_map = new Map(m_settings["debug"]["test_seed"].get<unsigned int>());
     m_map->generateChunk(512, 512);
+    m_map->getChunk(512, 512)->generateTexture();
 
     entt::registry& m_registry = m_map->getRegistry();
     m_player = m_registry.create();
@@ -247,11 +248,15 @@ void Game::execute() {
             // Draw performance window
             ImGui::Begin("Performance");
             ImGui::Text("FPS: %.2f", fps);
+            ImGui::Text("Player X: %f", m_registry.get<Object>(m_player).getPosition().x);
+            ImGui::Text("Player Y: %f", m_registry.get<Object>(m_player).getPosition().x);
+            ImGui::Text("DT: %f", std::min(elapsed, MAX_DT));
             ImGui::End();
         }
 
         // Draw
         m_win.setView(m_view);
+        m_win.clear();
         m_win.draw(*c0);
         m_win.draw(*c1);
         m_win.draw(*c2);

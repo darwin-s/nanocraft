@@ -130,6 +130,7 @@ void Map::simulateWorld(float dt) {
 
             if (getChunk(xPos, yPos) == nullptr) {
                 generateChunk(xPos, yPos);
+                m_chunks[yPos][xPos]->generateTexture();
             }
         }
     });
