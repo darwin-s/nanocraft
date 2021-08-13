@@ -16,8 +16,8 @@
 #define NANOCRAFT_MAP_HPP
 
 #include <Chunk.hpp>
+#include <Generator.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <FastNoiseLite.h>
 #include <entt/entt.hpp>
 
 namespace nc {
@@ -25,9 +25,6 @@ namespace nc {
 class Map {
 public:
     static constexpr unsigned int CHUNK_NO    = 1024;
-    static constexpr float FREQ               = 0.04f;
-    static constexpr unsigned long WORLD_SIZE = CHUNK_NO * Chunk::CHUNK_SIZE;
-    static constexpr unsigned int OCTAVES     = 8;
 
 public:
     static sf::Vector2u getChunkPos(float x, float y);
@@ -39,22 +36,21 @@ public:
                                      sf::Vector2u tilePos = sf::Vector2u(0, 0));
 
 public:
-    Map();
-    explicit Map(std::uint32_t seed);
+    explicit Map(Generator* gen = nullptr);
     ~Map();
+    void setGenerator(Generator* gen);
+    Generator* getGenerator() const;
     Chunk* getChunk(unsigned int x, unsigned int y);
     Chunk* getChunk(sf::Vector2u pos);
     void generateChunk(unsigned int x, unsigned int y);
     void generateChunk(sf::Vector2u pos);
-    [[nodiscard]] std::uint32_t getSeed() const;
     entt::registry& getRegistry();
     void simulateWorld([[maybe_unused]] float dt);
 
 private:
     Chunk*** m_chunks;
-    FastNoiseLite m_noiseGen;
-    std::uint32_t m_seed;
     entt::registry m_reg;
+    Generator* m_gen;
 };
 
 }

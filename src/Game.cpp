@@ -15,6 +15,7 @@
 #include <Game.hpp>
 #include <Version.hpp>
 #include <Map.hpp>
+#include <OverworldGenerator.hpp>
 #include <Object.hpp>
 #include <InputHandler.hpp>
 #include <PlayerInputComponent.hpp>
@@ -160,7 +161,8 @@ void Game::execute() {
         spdlog::error("Could not load texture sky.png!");
     }
 
-    m_map = new Map(m_settings["debug"]["test_seed"].get<unsigned int>());
+    OverworldGenerator og(m_settings["debug"]["test_seed"].get<unsigned int>());
+    m_map = new Map(&og);
     m_map->generateChunk(512, 512);
     m_map->getChunk(512, 512)->generateTexture();
 

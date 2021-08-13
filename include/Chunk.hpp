@@ -19,6 +19,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace nc {
 
@@ -30,6 +31,7 @@ public:
     Chunk(unsigned int xPos, unsigned int yPos);
     Tile& getTile(unsigned int x, unsigned  int y);
     void generateTexture();
+    sf::Vector2u getPosition() const;
 
 protected:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

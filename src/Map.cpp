@@ -39,27 +39,8 @@ sf::Vector2f Map::getGlobalPos(sf::Vector2u chunkPos, sf::Vector2u tilePos) {
     return getGlobalPos(chunkPos.x, chunkPos.y, tilePos.x, tilePos.y);
 }
 
-Map::Map() : m_seed(std::default_random_engine::default_seed) {
-    m_noiseGen.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    m_noiseGen.SetFractalType(FastNoiseLite::FractalType_FBm);
-    m_noiseGen.SetSeed(m_seed);
-    m_noiseGen.SetFrequency(FREQ);
-    m_noiseGen.SetFractalOctaves(OCTAVES);
-    m_chunks = new Chunk**[CHUNK_NO];
-    for (unsigned int y = 0; y < CHUNK_NO; y++) {
-        m_chunks[y] = new Chunk*[CHUNK_NO];
-        for (unsigned int x = 0; x < CHUNK_NO; x++) {
-            m_chunks[y][x] = nullptr;
-        }
-    }
-}
-
-Map::Map(std::uint32_t seed) : m_seed(seed) {
-    m_noiseGen.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    m_noiseGen.SetFractalType(FastNoiseLite::FractalType_FBm);
-    m_noiseGen.SetSeed(m_seed);
-    m_noiseGen.SetFrequency(FREQ);
-    m_noiseGen.SetFractalOctaves(OCTAVES);
+Map::Map(Generator* gen)
+    : m_gen(gen) {
     m_chunks = new Chunk**[CHUNK_NO];
     for (unsigned int y = 0; y < CHUNK_NO; y++) {
         m_chunks[y] = new Chunk*[CHUNK_NO];
@@ -80,6 +61,14 @@ Map::~Map() {
     delete[] m_chunks;
 }
 
+void Map::setGenerator(Generator* gen) {
+    m_gen = gen;
+}
+
+Generator* Map::getGenerator() const {
+    return m_gen;
+}
+
 Chunk* Map::getChunk(const unsigned int x, const unsigned int y) {
     return m_chunks[y][x];
 }
@@ -90,26 +79,14 @@ Chunk* Map::getChunk(const sf::Vector2u pos) {
 
 void Map::generateChunk(unsigned int x, unsigned int y) {
     m_chunks[y][x] = new Chunk(x, y);
-    for (unsigned int yTile = 0; yTile < Chunk::CHUNK_SIZE; yTile++) {
-        for (unsigned int xTile = 0; xTile < Chunk::CHUNK_SIZE; xTile++) {
-            const float globalXpos = x * Chunk::CHUNK_SIZE + xTile;
-            const float globalYpos = y * Chunk::CHUNK_SIZE + yTile;
-            const float val = m_noiseGen.GetNoise(globalXpos, globalYpos);
-            if (val < 0.0f) {
-                m_chunks[y][x]->getTile(xTile, yTile).setTexture("sand.png");
-            } else {
-                m_chunks[y][x]->getTile(xTile, yTile).setTexture("grass.png");
-            }
-        }
+    if (m_gen != nullptr) {
+        m_gen->generateChunk(m_chunks[y][x]);
     }
+    m_chunks[y][x]->generateTexture();
 }
 
 void Map::generateChunk(const sf::Vector2u pos) {
     generateChunk(pos.x, pos.y);
-}
-
-std::uint32_t Map::getSeed() const {
-    return m_seed;
 }
 
 entt::registry& Map::getRegistry() {
@@ -130,7 +107,6 @@ void Map::simulateWorld(float dt) {
 
             if (getChunk(xPos, yPos) == nullptr) {
                 generateChunk(xPos, yPos);
-                m_chunks[yPos][xPos]->generateTexture();
             }
         }
     });

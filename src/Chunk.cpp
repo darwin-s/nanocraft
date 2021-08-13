@@ -53,6 +53,10 @@ void Chunk::generateTexture() {
     m_tex.display();
 }
 
+sf::Vector2u Chunk::getPosition() const {
+    return sf::Vector2u(m_xPos, m_yPos);
+}
+
 void Chunk::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     target.draw(m_sprite);
 }
