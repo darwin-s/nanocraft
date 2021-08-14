@@ -29,6 +29,8 @@ public:
     explicit Widget(Widget* parent = nullptr);
     Widget* getParent();
     bool getFocused() const;
+    void setShown(bool show);
+    bool getShown() const;
 
 protected:
     virtual void handleEvent(sf::Event e) = 0;
@@ -42,6 +44,7 @@ private:
     friend class UI;
     Widget* m_parent;
     bool m_focused;
+    bool m_shown;
     UI* m_ui;
 };
 

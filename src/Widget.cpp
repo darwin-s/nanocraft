@@ -27,6 +27,14 @@ bool Widget::getFocused() const {
     return m_focused;
 }
 
+void Widget::setShown(bool show) {
+    m_shown = show;
+}
+
+bool Widget::getShown() const {
+    return m_shown;
+}
+
 void Widget::setFocused(bool focus) {
     m_focused = focus;
 }

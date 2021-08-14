@@ -19,7 +19,7 @@ namespace nc {
 
 UI::UI()
     : m_shown(false), m_view(sf::FloatRect(0.0f, 0.0f, 1.0f, 1.0f)),
-      m_focused(nullptr) {}
+      m_focused(nullptr), m_shown(true) {}
 
 void UI::setShown(bool shown) {
     m_shown = shown;
@@ -50,11 +50,17 @@ void UI::setFocus(Widget* w) {
 }
 
 void UI::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    if (!m_shown) {
+        return;
+    }
+
     const sf::View v = target.getView();
 
     target.setView(m_view);
     for (const auto& w : m_widgets) {
-        w->draw(target, states);
+        if (w->getShown() == true) {
+            w->draw(target, states);
+        }
     }
 
     target.setView(v);
