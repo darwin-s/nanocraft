@@ -17,7 +17,7 @@
 namespace nc {
 
 Widget::Widget(Widget* parent)
-    : m_parent(parent), m_focused(false), m_ui(nullptr) {}
+    : m_parent(parent), m_focused(false), m_shown(true), m_ui(nullptr) {}
 
 Widget* Widget::getParent() {
     return m_parent;
