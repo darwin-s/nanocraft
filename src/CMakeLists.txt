@@ -18,7 +18,11 @@ set(NC_INCLUDES
         ../include/InputHandler.hpp
         ../include/Physics.hpp
         ../include/Generator.hpp
-        ../include/OverworldGenerator.hpp)
+        ../include/OverworldGenerator.hpp
+        ../include/UI.hpp
+        ../include/Widget.hpp
+        ../include/ImageWidget.hpp
+        ../include/MainMenu.hpp)
 
 set(NC_SOURCES
         ${imgui_sfml_src}
@@ -32,7 +36,11 @@ set(NC_SOURCES
         InputHandler.cpp
         Physics.cpp
         Generator.cpp
-        OverworldGenerator.cpp)
+        OverworldGenerator.cpp
+        UI.cpp
+        Widget.cpp
+        ImageWidget.cpp
+        MainMenu.cpp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system network window audio graphics REQUIRED)
