@@ -16,7 +16,7 @@
 #define NC_GAME_HPP
 
 #include <TextureAtlas.hpp>
-#include <Map.hpp>
+#include <GameState.hpp>
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
@@ -37,8 +37,11 @@ public:
     const nlohmann::json& getSettings() const;
     void saveSettings();
     TextureAtlas& getTextureAtlas();
+    sf::View& getView();
     void setTimeScale(float scale);
     float getTimeScale() const;
+    void setState(GameState* newState);
+    GameState* getState() const;
 
     static Game* getInstance();
 
@@ -55,6 +58,9 @@ private:
     char** m_argv;
     bool m_drawConsole;
 
+    GameState* m_gameState; // Game state object
+    GameState* m_requestedState; // Requested game state
+
     nlohmann::json m_settings;
     
     std::ostringstream m_logData; // Log data stream
@@ -67,10 +73,6 @@ private:
     sf::RenderWindow m_win; // Game window
     sf::View m_view; // Main camera
     float m_timeScale; // Game time scale
-
-    entt::entity m_player;
-
-    Map* m_map;
 };
 
 }

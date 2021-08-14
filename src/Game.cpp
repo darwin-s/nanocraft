@@ -14,14 +14,8 @@
 
 #include <Game.hpp>
 #include <Version.hpp>
-#include <Map.hpp>
-#include <OverworldGenerator.hpp>
-#include <Object.hpp>
-#include <InputHandler.hpp>
-#include <PlayerInputComponent.hpp>
-#include <PlayerComponent.hpp>
-#include <VelocityComponent.hpp>
-#include <Physics.hpp>
+#include <MainMenuState.hpp>
+#include <Chunk.hpp>
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <physfs.h>
@@ -37,7 +31,8 @@ namespace nc {
 Game* Game::m_inst = nullptr;
 
 Game::Game(int argc, char** argv)
-    : m_argc(argc), m_argv(argv), m_drawConsole(false), m_timeScale(1.0f) {
+    : m_argc(argc), m_argv(argv), m_drawConsole(false), m_timeScale(1.0f),
+      m_gameState(nullptr), m_requestedState(nullptr) {
     assert(m_inst == nullptr);
     m_inst = this;
 
@@ -67,12 +62,28 @@ TextureAtlas& Game::getTextureAtlas() {
     return m_atlas;
 }
 
+sf::View& Game::getView() {
+    return m_view;
+}
+
 void Game::setTimeScale(const float scale) {
     m_timeScale = scale;
 }
 
 float Game::getTimeScale() const {
     return m_timeScale;
+}
+
+void Game::setState(GameState* newState) {
+    m_requestedState = newState;
+}
+
+GameState* Game::getState() const {
+    if (m_requestedState != nullptr) {
+        return m_requestedState;
+    }
+
+    return m_gameState;
 }
 
 Game* Game::getInstance() {
@@ -147,6 +158,9 @@ void Game::setup() {
 
     ImGui::SFML::Init(m_win);
     ImGui::GetIO().IniFilename = nullptr;
+
+    // Get into the main menu
+    setState(new MainMenuState());
 }
 
 void Game::execute() {
@@ -161,37 +175,9 @@ void Game::execute() {
         spdlog::error("Could not load texture sky.png!");
     }
 
-    OverworldGenerator og(m_settings["debug"]["test_seed"].get<unsigned int>());
-    m_map = new Map(&og);
-    m_map->generateChunk(512, 512);
-    m_map->getChunk(512, 512)->generateTexture();
-
-    entt::registry& m_registry = m_map->getRegistry();
-    m_player = m_registry.create();
-    m_registry.emplace<Object>(m_player, "player.png");
-    m_registry.emplace<PlayerComponent>(m_player);
-    m_registry.emplace<PlayerInputComponent>(m_player);
-    m_registry.emplace<VelocityComponent>(m_player);
-    m_registry.emplace<sf::View*>(m_player, &m_view);
-    m_registry.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
-    m_registry.get<Object>(m_player).setPosition(
-        sf::Vector2f(16400.0f, 16400.0f));
-    m_view.setCenter(16400.0f, 16400.0f);
-
-    // TODO remove this
-    Chunk* c0 = nullptr;
-    Chunk* c1 = nullptr;
-    Chunk* c2 = nullptr;
-    Chunk* c3 = nullptr;
-    Chunk* c4 = nullptr;
-    Chunk* c5 = nullptr;
-    Chunk* c6 = nullptr;
-    Chunk* c7 = nullptr;
-    Chunk* c8 = nullptr;
-    
     sf::Clock frameTime;
     sf::Clock updateFpsTimer;
-    float fps = 0.0f;
+    float fps   = 0.0f;
     float accum = 0.0f;
 
     while (m_win.isOpen()) {
@@ -199,13 +185,13 @@ void Game::execute() {
         float elapsed = m_delta.restart().asSeconds();
         accum += elapsed;
 
-        // Poll inputs
-        InputHandler::pollInput(m_registry);
+        if (m_requestedState != nullptr) {
+            delete m_gameState;
+            m_gameState = m_requestedState;
+            m_requestedState = nullptr;
+        }
 
-        // TODO: remove
-        Object& player = m_registry.get<Object>(m_player);
-        unsigned int chunkX = Map::getChunkPos(player.getPosition()).x;
-        unsigned int chunkY = Map::getChunkPos(player.getPosition()).y;
+        m_gameState->perFrame();
 
         // Process events
         sf::Event e;
@@ -223,33 +209,18 @@ void Game::execute() {
                 }
             }
 
-            InputHandler::handleInput(e, m_registry);
+            m_gameState->handleEvent(e);
         }
 
         // Update imgui
         ImGui::SFML::Update(m_win, sf::seconds(elapsed));
 
-
-        // Simulate physics and world
+        // Update state
         while (accum >= TIMESTEP) {
-            // Simulate physics
-            Physics::simulate(m_registry, TIMESTEP * m_timeScale);
-            // Simulate world
-            m_map->simulateWorld(TIMESTEP * m_timeScale);
-            m_view.setCenter(player.getPosition());
+            m_gameState->update(TIMESTEP * m_timeScale);
 
             accum -= TIMESTEP;
         }
-
-        c0 = m_map->getChunk(chunkX, chunkY);
-        c1 = m_map->getChunk(chunkX - 1, chunkY - 1);
-        c2 = m_map->getChunk(chunkX, chunkY - 1);
-        c3 = m_map->getChunk(chunkX + 1, chunkY - 1);
-        c4 = m_map->getChunk(chunkX - 1, chunkY);
-        c5 = m_map->getChunk(chunkX + 1, chunkY);
-        c6 = m_map->getChunk(chunkX - 1, chunkY + 1);
-        c7 = m_map->getChunk(chunkX, chunkY + 1);
-        c8 = m_map->getChunk(chunkX + 1, chunkY + 1);
 
         // Draw gui here
         if (m_drawConsole) {
@@ -260,42 +231,13 @@ void Game::execute() {
             // Draw performance window
             ImGui::Begin("Performance");
             ImGui::Text("FPS: %.2f", fps);
-            ImGui::Text("Player X: %f", m_registry.get<Object>(m_player).getPosition().x);
-            ImGui::Text("Player Y: %f", m_registry.get<Object>(m_player).getPosition().y);
             ImGui::End();
         }
 
         // Draw
         m_win.setView(m_view);
         m_win.clear();
-        if (c0 != nullptr) {
-            m_win.draw(*c0);
-        }
-        if (c1 != nullptr) {
-            m_win.draw(*c1);
-        }
-        if (c2 != nullptr) {
-            m_win.draw(*c2);
-        }
-        if (c3 != nullptr) {
-            m_win.draw(*c3);
-        }
-        if (c4 != nullptr) {
-            m_win.draw(*c4);
-        }
-        if (c5 != nullptr) {
-            m_win.draw(*c5);
-        }
-        if (c6 != nullptr) {
-            m_win.draw(*c6);
-        }
-        if (c7 != nullptr) {
-            m_win.draw(*c7);
-        }
-        if (c8 != nullptr) {
-            m_win.draw(*c8);
-        }
-        m_win.draw(m_registry.get<Object>(m_player));
+        m_gameState->draw(m_win);
         // Draw imgui
         ImGui::EndFrame();
         ImGui::SFML::Render(m_win);
