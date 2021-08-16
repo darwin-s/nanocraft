@@ -1,54 +1,54 @@
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../include/Version.hpp.in
-        ${CMAKE_CURRENT_BINARY_DIR}/../include/Version.hpp
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../include/General/Version.hpp.in
+        ${CMAKE_CURRENT_BINARY_DIR}/../include/General/Version.hpp
         @ONLY)
 
 set(NC_GENERATED
-        ${CMAKE_CURRENT_BINARY_DIR}/../include/Version.hpp)
+        ${CMAKE_CURRENT_BINARY_DIR}/../include/General/Version.hpp)
 
 set(NC_INCLUDES
-        ../include/Game.hpp
-        ../include/TextureAtlas.hpp
-        ../include/Map.hpp
-        ../include/Tile.hpp
-        ../include/Chunk.hpp
-        ../include/Object.hpp
-        ../include/VelocityComponent.hpp
-        ../include/PlayerComponent.hpp
-        ../include/PlayerInputComponent.hpp
-        ../include/InputHandler.hpp
-        ../include/Physics.hpp
-        ../include/Generator.hpp
-        ../include/OverworldGenerator.hpp
-        ../include/UI.hpp
-        ../include/Widget.hpp
-        ../include/ImageWidget.hpp
-        ../include/MainMenu.hpp
-        ../include/GameState.hpp
-        ../include/MainMenuState.hpp
-        ../include/PlayingState.hpp
-        ../include/ButtonWidget.hpp)
+        ../include/Components/VelocityComponent.hpp
+        ../include/Components/PlayerComponent.hpp
+        ../include/Components/PlayerInputComponent.hpp
+        ../include/Game/Game.hpp
+        ../include/Game/GameState.hpp
+        ../include/Game/MainMenuState.hpp
+        ../include/Game/PlayingState.hpp
+        ../include/General/TextureAtlas.hpp
+        ../include/General/Object.hpp
+        ../include/General/InputHandler.hpp
+        ../include/General/Physics.hpp
+        ../include/UI/UI.hpp
+        ../include/UI/Widget.hpp
+        ../include/UI/ImageWidget.hpp
+        ../include/UI/MainMenu.hpp
+        ../include/UI/ButtonWidget.hpp
+        ../include/World/Map.hpp
+        ../include/World/Tile.hpp
+        ../include/World/Chunk.hpp
+        ../include/World/Generator.hpp
+        ../include/World/OverworldGenerator.hpp)
 
 set(NC_SOURCES
         ${imgui_sfml_src}
-        main.cpp
-        Game.cpp
-        TextureAtlas.cpp
-        Map.cpp
-        Tile.cpp
-        Chunk.cpp
-        Object.cpp
-        InputHandler.cpp
-        Physics.cpp
-        Generator.cpp
-        OverworldGenerator.cpp
-        UI.cpp
-        Widget.cpp
-        ImageWidget.cpp
-        MainMenu.cpp
-        GameState.cpp
-        MainMenuState.cpp
-        PlayingState.cpp
-        ButtonWidget.cpp)
+        Game/Game.cpp
+        Game/GameState.cpp
+        Game/MainMenuState.cpp
+        Game/PlayingState.cpp
+        General/main.cpp
+        General/TextureAtlas.cpp
+        General/Object.cpp
+        General/InputHandler.cpp
+        General/Physics.cpp
+        UI/UI.cpp
+        UI/Widget.cpp
+        UI/ImageWidget.cpp
+        UI/MainMenu.cpp
+        UI/ButtonWidget.cpp
+        World/Map.cpp
+        World/Tile.cpp
+        World/Chunk.cpp
+        World/Generator.cpp
+        World/OverworldGenerator.cpp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system network window audio graphics REQUIRED)
