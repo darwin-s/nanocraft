@@ -44,6 +44,7 @@ set(NC_SOURCES
         Widget.cpp
         ImageWidget.cpp
         MainMenu.cpp
+        GameState.cpp
         MainMenuState.cpp
         PlayingState.cpp)
 
