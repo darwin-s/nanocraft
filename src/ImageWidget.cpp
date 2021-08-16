@@ -29,6 +29,8 @@ void ImageWidget::setTexture(const std::string& texture) {
         Game::getInstance()->getTextureAtlas().getTexture(texture);
     m_sprite.setTexture(*inf.texture);
     m_sprite.setTextureRect(inf.textureRect);
+    m_sprite.setScale(1.0f / static_cast<float>(inf.texture->getSize().x),
+                      1.0f / static_cast<float>(inf.texture->getSize().y));
 }
 
 sf::Sprite& ImageWidget::getSprite() {
