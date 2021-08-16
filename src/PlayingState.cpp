@@ -37,6 +37,7 @@ PlayingState::PlayingState()
     reg.emplace<sf::View*>(m_player, &Game::getInstance()->getView());
     reg.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
     reg.get<Object>(m_player).setPosition(sf::Vector2f(16400.0f, 16400.0f));
+    reg.get<sf::View*>(m_player)->setCenter(16400.0f, 16400.0f);
 }
 
 PlayingState::~PlayingState() {
@@ -57,8 +58,6 @@ void PlayingState::update(const float dt) {
     Physics::simulate(m_map->getRegistry(), dt);
     // Simulate world
     m_map->simulateWorld(dt);
-    m_map->getRegistry().get<sf::View*>(m_player)->setCenter(
-        m_map->getRegistry().get<Object>(m_player).getPosition());
 }
 
 void PlayingState::draw(sf::RenderWindow& win) {

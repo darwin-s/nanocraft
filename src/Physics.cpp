@@ -16,33 +16,40 @@
 #include <VelocityComponent.hpp>
 #include <Object.hpp>
 #include <cmath>
+#include <SFML/Graphics/View.hpp>
 
 namespace nc {
 
 void Physics::simulate(entt::registry& reg, const float dt) {
-    reg.view<VelocityComponent, Object>().each([=](auto& vel, auto& obj) {
-        if (vel.velocity.x == 0.0f && vel.velocity.y == 0.0f) {
-            return;
-        }
+    reg.view<VelocityComponent, Object>().each(
+        [&](auto ent, auto& vel, auto& obj) {
+            if (vel.velocity.x == 0.0f && vel.velocity.y == 0.0f) {
+                return;
+            }
 
-        obj.move(vel.velocity * dt);
+            obj.move(vel.velocity * dt);
+            sf::View** v = reg.try_get<sf::View*>(ent);
+            if (v != nullptr) {
+                (*v)->move(vel.velocity * dt);
+            }
 
-        // Find magnitude of movement vector
-        const float mag = std::sqrtf(vel.velocity.x * vel.velocity.x +
-                                     vel.velocity.y * vel.velocity.y);
+            // Find magnitude of movement vector
+            const float mag = std::sqrtf(vel.velocity.x * vel.velocity.x +
+                                         vel.velocity.y * vel.velocity.y);
 
-        // Find deceleration vector
-        const sf::Vector2f dec = vel.velocity * (-1.0f / mag * VELOCITY_DECEL) * dt;
-        const float decMag     = std::sqrtf(dec.x * dec.x + dec.y * dec.y);
+            // Find deceleration vector
+            const sf::Vector2f dec =
+                vel.velocity * (-1.0f / mag * VELOCITY_DECEL) * dt;
+            const float decMag = std::sqrtf(dec.x * dec.x + dec.y * dec.y);
 
-        // Decelerate
-        if (decMag >= mag) {
-            vel.velocity.x = 0.0f;
-            vel.velocity.y = 0.0f;
-        } else {
-            vel.velocity += dec;
-        }
-    });
+            // Decelerate
+            if (decMag >= mag) {
+                vel.velocity.x = 0.0f;
+                vel.velocity.y = 0.0f;
+            } else {
+                vel.velocity += dec;
+            }
+        });
 }
 
 }
