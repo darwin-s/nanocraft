@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <Widget.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
 
 namespace nc {
 
@@ -35,12 +36,20 @@ bool Widget::getShown() const {
     return m_shown;
 }
 
+sf::Sprite& Widget::getSprite() {
+    return m_sprite;
+}
+
 void Widget::setFocused(bool focus) {
     m_focused = focus;
 }
 
 UI* Widget::getUI() {
     return m_ui;
+}
+
+void Widget::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(m_sprite, states);
 }
 
 }

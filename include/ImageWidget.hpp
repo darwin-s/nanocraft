@@ -26,14 +26,9 @@ public:
     explicit ImageWidget(Widget* parent = nullptr);
     explicit ImageWidget(const std::string& texture, Widget* parent = nullptr);
     void setTexture(const std::string& texture);
-    sf::Sprite& getSprite();
 
 protected:
     void handleEvent(sf::Event e) override;
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-
-private:
-    sf::Sprite m_sprite;
 };
 
 }

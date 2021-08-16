@@ -31,6 +31,7 @@ public:
     bool getFocused() const;
     void setShown(bool show);
     bool getShown() const;
+    sf::Sprite& getSprite();
 
 protected:
     virtual void handleEvent(sf::Event e) = 0;
@@ -38,7 +39,7 @@ protected:
     UI* getUI();
 
     virtual void draw(sf::RenderTarget& target,
-                      sf::RenderStates states) const = 0;
+                      sf::RenderStates states) const override;
 
 private:
     friend class UI;
@@ -46,6 +47,7 @@ private:
     bool m_focused;
     bool m_shown;
     UI* m_ui;
+    sf::Sprite m_sprite;
 };
 
 }

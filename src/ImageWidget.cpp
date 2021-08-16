@@ -27,21 +27,14 @@ ImageWidget::ImageWidget(const std::string& texture, Widget* parent)
 void ImageWidget::setTexture(const std::string& texture) {
     TextureAtlas::TextureInfo inf =
         Game::getInstance()->getTextureAtlas().getTexture(texture);
-    m_sprite.setTexture(*inf.texture);
-    m_sprite.setTextureRect(inf.textureRect);
-    m_sprite.setScale(1.0f / static_cast<float>(inf.texture->getSize().x),
-                      1.0f / static_cast<float>(inf.texture->getSize().y));
-}
 
-sf::Sprite& ImageWidget::getSprite() {
-    return m_sprite;
+    sf::Sprite& sprite = getSprite();
+    sprite.setTexture(*inf.texture);
+    sprite.setTextureRect(inf.textureRect);
+    sprite.setScale(1.0f / static_cast<float>(inf.texture->getSize().x),
+                    1.0f / static_cast<float>(inf.texture->getSize().y));
 }
 
 void ImageWidget::handleEvent(sf::Event e) {}
-
-void ImageWidget::draw(sf::RenderTarget& target,
-                       sf::RenderStates states) const {
-    target.draw(m_sprite, states);
-}
 
 }
