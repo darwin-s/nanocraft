@@ -18,7 +18,8 @@
 
 namespace nc {
 
-TextureAtlas::TextureAtlas(unsigned int tileSize) : m_tileSize(tileSize) {
+TextureAtlas::TextureAtlas(unsigned int tileSize)
+    : m_tileSize(tileSize), m_freeSprite(0) {
     AtlasPage& p1 = m_textures[0];
 
     p1.xFreeOffset = m_tileSize;
@@ -82,11 +83,21 @@ bool TextureAtlas::addTexture(const std::filesystem::path& path) {
 
     // Check if texture has the right size
     if (img.getSize().x != m_tileSize || img.getSize().y != m_tileSize) {
-        spdlog::warn("Wrong size for texture {}!", path.string());
-        spdlog::warn("Expected a {}x{} texture!", m_tileSize, m_tileSize);
-        spdlog::warn("Using default texture!");
-        img.create(m_tileSize, m_tileSize, sf::Color::Magenta);
-        couldLoad = false;
+        sf::Texture t;
+        t.loadFromImage(img);
+        m_otherTextures[m_freeSprite++] = std::move(t);
+
+        TextureInfo ti;
+        ti.texture            = &m_otherTextures[m_freeSprite - 1];
+        ti.textureRect.left   = 0;
+        ti.textureRect.top    = 0;
+        ti.textureRect.width  = img.getSize().x;
+        ti.textureRect.height = img.getSize().y;
+        ti.textureIndex       = 0;
+
+        m_texInfo[path.string()] = ti;
+
+        return true;
     }
 
     // Find first free page

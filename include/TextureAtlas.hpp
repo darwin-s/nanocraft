@@ -34,8 +34,9 @@ public:
 
 public:
     static constexpr unsigned int MAX_TEXTURES = 16;
-    static constexpr unsigned int DEFAULT_TILE_SIZE = 32;
+    static constexpr unsigned int DEFAULT_TILE_SIZE = 16;
     static constexpr unsigned int PAGE_SIZE = 1024;
+    static constexpr unsigned int MAX_SPRITES = 2048;
 
 public:
     explicit TextureAtlas(unsigned int tileSize = DEFAULT_TILE_SIZE);
@@ -53,6 +54,8 @@ private:
 
 private:
     std::array<AtlasPage, MAX_TEXTURES> m_textures;
+    std::array<sf::Texture, MAX_SPRITES> m_otherTextures;
+    unsigned int m_freeSprite;
     std::unordered_map<std::string, TextureInfo> m_texInfo;
     const unsigned int m_tileSize;
 };
