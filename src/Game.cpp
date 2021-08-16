@@ -158,9 +158,6 @@ void Game::setup() {
 
     ImGui::SFML::Init(m_win);
     ImGui::GetIO().IniFilename = nullptr;
-
-    // Get into the main menu
-    setState(new MainMenuState());
 }
 
 void Game::execute() {
@@ -174,6 +171,15 @@ void Game::execute() {
     if (!m_atlas.addTexture("sky.png")) {
         spdlog::error("Could not load texture sky.png!");
     }
+    if (!m_atlas.addTexture("menubackground.png")) {
+        spdlog::error("Could not load texture menubackground.png!");
+    }
+    if (!m_atlas.addTexture("player.png")) {
+        spdlog::error("Could not load texture player.png!");
+    }
+
+    // Get into the main menu
+    setState(new MainMenuState());
 
     sf::Clock frameTime;
     sf::Clock updateFpsTimer;
