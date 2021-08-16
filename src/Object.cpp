@@ -41,11 +41,14 @@ sf::Vector2u Object::getSize() const {
 
 void Object::setSize(sf::Vector2u size) {
     m_size = size;
-    const unsigned int tileSize =
-        Game::getInstance()->getTextureAtlas().getTileSize();
+    const float texWidth =
+        static_cast<float>(sf::Sprite::getTextureRect().width);
+    const float texHeight =
+        static_cast<float>(sf::Sprite::getTextureRect().height);
+
     sf::Sprite::setScale(
-        static_cast<float>(m_size.x) / static_cast<float>(tileSize),
-        static_cast<float>(m_size.y) / static_cast<float>(tileSize));
+        static_cast<float>(size.x) / static_cast<float>(texWidth),
+        static_cast<float>(size.y) / static_cast<float>(texHeight));
 }
 
 }
