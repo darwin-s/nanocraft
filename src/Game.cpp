@@ -148,9 +148,9 @@ void Game::setup() {
     float aspectRatio =
         static_cast<float>(modeWidth) / static_cast<float>(modeHeight);
 
-    m_view.reset(
-        sf::FloatRect(0.0f, 0.0f, static_cast<float>(Chunk::CHUNK_SIZE),
-                      static_cast<float>(Chunk::CHUNK_SIZE) / aspectRatio));
+    m_view.reset(sf::FloatRect(
+        0.0f, 0.0f, static_cast<float>(Chunk::VIEWABLE_TILES),
+        static_cast<float>(Chunk::VIEWABLE_TILES) / (aspectRatio)));
 
     m_win.create(sf::VideoMode(modeWidth, modeHeight), "Nanocraft",
                  windowStyle);
@@ -193,7 +193,7 @@ void Game::execute() {
 
         if (m_requestedState != nullptr) {
             delete m_gameState;
-            m_gameState = m_requestedState;
+            m_gameState      = m_requestedState;
             m_requestedState = nullptr;
         }
 

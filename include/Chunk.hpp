@@ -26,6 +26,7 @@ namespace nc {
 class Chunk : public sf::Drawable {
 public:
     static constexpr unsigned int CHUNK_SIZE = 32;
+    static constexpr unsigned int VIEWABLE_TILES = 25;
 
 public:
     Chunk(unsigned int xPos, unsigned int yPos);
