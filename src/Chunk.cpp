@@ -31,8 +31,8 @@ Chunk::Chunk(const unsigned int xPos, const unsigned int yPos)
 
     for (unsigned int y = 0; y < CHUNK_SIZE; y++) {
         for (unsigned int x = 0; x < CHUNK_SIZE; x++) {
-            m_tiles[y][x].setPosition(static_cast<float>(x * CHUNK_SIZE),
-                                      static_cast<float>(y * CHUNK_SIZE));
+            m_tiles[y][x].setPosition(static_cast<float>(x * tileSize),
+                                      static_cast<float>(y * tileSize));
         }
     }
 }
