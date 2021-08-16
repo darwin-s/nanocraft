@@ -25,7 +25,8 @@ set(NC_INCLUDES
         ../include/MainMenu.hpp
         ../include/GameState.hpp
         ../include/MainMenuState.hpp
-        ../include/PlayingState.hpp)
+        ../include/PlayingState.hpp
+        ../include/ButtonWidget.hpp)
 
 set(NC_SOURCES
         ${imgui_sfml_src}
@@ -46,7 +47,8 @@ set(NC_SOURCES
         MainMenu.cpp
         GameState.cpp
         MainMenuState.cpp
-        PlayingState.cpp)
+        PlayingState.cpp
+        ButtonWidget.cpp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system network window audio graphics REQUIRED)

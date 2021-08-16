@@ -49,6 +49,10 @@ void UI::setFocus(Widget* w) {
     m_focused->setFocused(true);
 }
 
+sf::View& UI::getView() {
+    return m_view;
+}
+
 void UI::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     if (!m_shown) {
         return;

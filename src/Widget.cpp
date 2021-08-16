@@ -14,6 +14,7 @@
 
 #include <Widget.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <Game.hpp>
 
 namespace nc {
 
@@ -38,6 +39,27 @@ bool Widget::getShown() const {
 
 sf::Sprite& Widget::getSprite() {
     return m_sprite;
+}
+
+void Widget::setSize(float width, float height) {
+    const sf::IntRect& texRect = m_sprite.getTextureRect();
+
+    m_sprite.setScale(width / static_cast<float>(texRect.width),
+                      height / static_cast<float>(texRect.height));
+}
+
+void Widget::setSize(sf::Vector2f size) {
+    setSize(size.x, size.y);
+}
+
+void Widget::setTexture(const std::string& texture) {
+    TextureAtlas::TextureInfo inf =
+        Game::getInstance()->getTextureAtlas().getTexture(texture);
+
+    sf::Sprite& sprite = getSprite();
+    sprite.setTexture(*inf.texture);
+    sprite.setTextureRect(inf.textureRect);
+    setSize(1.0f, 1.0f);
 }
 
 void Widget::setFocused(bool focus) {

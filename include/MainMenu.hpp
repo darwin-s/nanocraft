@@ -17,6 +17,7 @@
 
 #include <UI.hpp>
 #include <ImageWidget.hpp>
+#include <ButtonWidget.hpp>
 
 namespace nc {
 
@@ -26,6 +27,7 @@ public:
 
 private:
     ImageWidget m_background;
+    ButtonWidget m_startGame;
 };
 
 }

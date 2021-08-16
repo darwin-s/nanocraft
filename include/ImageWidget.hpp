@@ -25,7 +25,6 @@ class ImageWidget : public Widget {
 public:
     explicit ImageWidget(Widget* parent = nullptr);
     explicit ImageWidget(const std::string& texture, Widget* parent = nullptr);
-    void setTexture(const std::string& texture);
 
 protected:
     void handleEvent(sf::Event e) override;

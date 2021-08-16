@@ -26,10 +26,6 @@ void MainMenuState::perFrame() {}
 
 void MainMenuState::handleEvent(sf::Event e) {
     m_mainMenu.handleEvent(e);
-
-    if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Enter) {
-        Game::getInstance()->setState(new PlayingState());
-    }
 }
 
 void MainMenuState::update(const float dt) {}

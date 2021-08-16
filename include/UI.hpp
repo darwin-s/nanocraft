@@ -31,6 +31,7 @@ public:
     void handleEvent(sf::Event e);
     void addWidget(Widget* w);
     void setFocus(Widget* w);
+    sf::View& getView();
 
 protected:
     virtual void draw(sf::RenderTarget& target,

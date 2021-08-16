@@ -32,6 +32,9 @@ public:
     void setShown(bool show);
     bool getShown() const;
     sf::Sprite& getSprite();
+    void setSize(float width, float height);
+    void setSize(sf::Vector2f size);
+    void setTexture(const std::string& texture);
 
 protected:
     virtual void handleEvent(sf::Event e) = 0;

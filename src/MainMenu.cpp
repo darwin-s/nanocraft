@@ -13,11 +13,20 @@
 // limitations under the License.
 
 #include <MainMenu.hpp>
+#include <Game.hpp>
+#include <PlayingState.hpp>
 
 namespace nc {
 
-MainMenu::MainMenu() : m_background("menubackground.png") {
+MainMenu::MainMenu() : m_background("menubackground.png"), m_startGame("button.png") {
     addWidget(&m_background);
+    addWidget(&m_startGame);
+
+    m_startGame.getSprite().setPosition(0.4f, 0.55f);
+    m_startGame.setSize(0.2f, 0.1f);
+    m_startGame.setOnClick([](){
+        Game::getInstance()->setState(new PlayingState());
+    });
 }
 
 }

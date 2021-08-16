@@ -42,6 +42,7 @@ public:
     float getTimeScale() const;
     void setState(GameState* newState);
     GameState* getState() const;
+    sf::RenderWindow& getWindow();
 
     static Game* getInstance();
 

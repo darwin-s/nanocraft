@@ -86,6 +86,10 @@ GameState* Game::getState() const {
     return m_gameState;
 }
 
+sf::RenderWindow& Game::getWindow() {
+    return m_win;
+}
+
 Game* Game::getInstance() {
     return m_inst;
 }
@@ -176,6 +180,9 @@ void Game::execute() {
     }
     if (!m_atlas.addTexture("player.png")) {
         spdlog::error("Could not load texture player.png!");
+    }
+    if (!m_atlas.addTexture("button.png")) {
+        spdlog::error("Could not load texture button.png!");
     }
 
     // Get into the main menu
