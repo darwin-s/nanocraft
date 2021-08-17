@@ -36,10 +36,17 @@ void ButtonWidget::handleEvent(sf::Event e) {
             sf::RenderWindow& win = Game::getInstance()->getWindow();
             UI* ui = getUI();
             sf::Vector2i mousePos(e.mouseButton.x, e.mouseButton.y);
-            sf::Vector2f pos = win.mapPixelToCoords(mousePos, ui->getView());
+            sf::Vector2f pos;
+            if (ui != nullptr) {
+                pos = win.mapPixelToCoords(mousePos, ui->getView());
+            } else {
+                pos = win.mapPixelToCoords(mousePos);
+            }
 
             if (getSprite().getGlobalBounds().contains(pos)) {
-                m_onClick();
+                if (m_onClick) {
+                    m_onClick();
+                }
             }
         }
     }
