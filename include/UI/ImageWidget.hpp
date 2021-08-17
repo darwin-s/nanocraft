@@ -28,6 +28,7 @@ public:
 
 protected:
     void handleEvent(sf::Event e) override;
+    void update() override;
 };
 
 }

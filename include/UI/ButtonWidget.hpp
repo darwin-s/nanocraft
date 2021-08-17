@@ -29,6 +29,7 @@ public:
 
 protected:
     void handleEvent(sf::Event e) override;
+    void update() override;
 
 private:
     std::function<void()> m_onClick;

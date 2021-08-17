@@ -38,6 +38,7 @@ public:
 
 protected:
     virtual void handleEvent(sf::Event e) = 0;
+    virtual void update() = 0;
     void setFocused(bool focus);
     UI* getUI();
 

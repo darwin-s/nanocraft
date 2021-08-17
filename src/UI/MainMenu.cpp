@@ -37,4 +37,14 @@ MainMenu::MainMenu()
         []() { Game::getInstance()->setState(new PlayingState()); });
 }
 
+void MainMenu::update() {
+    const float screenVerticalSize =
+        static_cast<float>(m_background.getSprite().getTextureRect().width) /
+        getAspectRatio();
+    const float verticalSize =
+        static_cast<float>(m_background.getSprite().getTextureRect().height) /
+        screenVerticalSize;
+    m_background.setSize(1.0f, std::max(1.0f, verticalSize));
+}
+
 }

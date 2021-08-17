@@ -1,11 +1,11 @@
 // Copyright 2021 Sirbu Dan
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ void ButtonWidget::handleEvent(sf::Event e) {
     if (e.type == sf::Event::MouseButtonPressed) {
         if (e.mouseButton.button == sf::Mouse::Left) {
             sf::RenderWindow& win = Game::getInstance()->getWindow();
-            UI* ui = getUI();
+            UI* ui                = getUI();
             sf::Vector2i mousePos(e.mouseButton.x, e.mouseButton.y);
             sf::Vector2f pos;
             if (ui != nullptr) {
@@ -51,5 +51,7 @@ void ButtonWidget::handleEvent(sf::Event e) {
         }
     }
 }
+
+void ButtonWidget::update() {}
 
 }

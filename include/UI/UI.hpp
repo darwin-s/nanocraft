@@ -34,6 +34,7 @@ public:
     sf::View& getView();
     void setAspectRatio(float aspectRatio);
     float getAspectRatio() const;
+    virtual void update() = 0;
 
 protected:
     virtual void draw(sf::RenderTarget& target,

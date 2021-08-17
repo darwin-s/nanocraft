@@ -38,6 +38,8 @@ PlayingState::PlayingState()
     reg.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
     reg.get<Object>(m_player).setPosition(sf::Vector2f(16400.0f, 16400.0f));
     reg.get<sf::View*>(m_player)->setCenter(16400.0f, 16400.0f);
+    m_playerUI.setAspectRatio(16.0f / 9.0f);
+    m_playerUI.setShown(true);
 }
 
 PlayingState::~PlayingState() {
@@ -47,10 +49,12 @@ PlayingState::~PlayingState() {
 
 void PlayingState::perFrame() {
     InputHandler::pollInput(m_map->getRegistry());
+    m_playerUI.update();
 }
 
 void PlayingState::handleEvent(sf::Event e) {
     InputHandler::handleInput(e, m_map->getRegistry());
+    m_playerUI.handleEvent(e);
 }
 
 void PlayingState::update(const float dt) {
@@ -107,6 +111,8 @@ void PlayingState::draw(sf::RenderWindow& win) {
         win.draw(*c8);
     }
     win.draw(m_map->getRegistry().get<Object>(m_player));
+    // Draw ui
+    win.draw(m_playerUI);
 }
 
 }

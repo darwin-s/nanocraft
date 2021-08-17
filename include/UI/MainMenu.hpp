@@ -24,6 +24,7 @@ namespace nc {
 class MainMenu : public UI {
 public:
     MainMenu();
+    void update() override;
 
 private:
     ImageWidget m_background;

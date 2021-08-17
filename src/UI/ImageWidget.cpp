@@ -25,4 +25,6 @@ ImageWidget::ImageWidget(const std::string& texture, Widget* parent)
 
 void ImageWidget::handleEvent(sf::Event e) {}
 
+void ImageWidget::update() {}
+
 }

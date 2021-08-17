@@ -12,29 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <Game/MainMenuState.hpp>
-#include <Game/Game.hpp>
-#include <Game/PlayingState.hpp>
+#include <UI/PlayerUI.hpp>
 
 namespace nc {
 
-MainMenuState::MainMenuState(float aspectRatio) {
-    m_mainMenu.setAspectRatio(aspectRatio);
-    m_mainMenu.setShown(true);
+PlayerUI::PlayerUI() : m_toolBar("toolbar.png") {
+    addWidget(&m_toolBar);
 }
 
-void MainMenuState::perFrame() {
-    m_mainMenu.update();
-}
+void PlayerUI::update() {
+    const float texAR =
+        static_cast<float>(m_toolBar.getSprite().getTextureRect().width) /
+        static_cast<float>(m_toolBar.getSprite().getTextureRect().height);
 
-void MainMenuState::handleEvent(sf::Event e) {
-    m_mainMenu.handleEvent(e);
-}
-
-void MainMenuState::update(const float dt) {}
-
-void MainMenuState::draw(sf::RenderWindow& win) {
-    win.draw(m_mainMenu);
+    const float height = (0.5f / texAR) * (16.0f / 9.0f);
+    const float yPos   = 1.0f - height;
+    m_toolBar.setSize(0.5f, height);
+    m_toolBar.getSprite().setPosition(0.25f, yPos);
 }
 
 }
