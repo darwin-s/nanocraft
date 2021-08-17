@@ -26,6 +26,24 @@
 #include <stdexcept>
 #include <algorithm>
 
+namespace {
+
+PHYSFS_EnumerateCallbackResult
+    loadTextureCallback(void* data, const char* origdir, const char* fname) {
+    std::string texPath;
+    texPath += origdir;
+    texPath += '/';
+    texPath += fname;
+
+    if (!nc::Game::getInstance()->getTextureAtlas().addTexture(texPath)) {
+        spdlog::error("Could not load texture {}", texPath);
+    }
+
+    return PHYSFS_ENUM_OK;
+}
+
+}
+
 namespace nc {
 
 Game* Game::m_inst = nullptr;
@@ -165,28 +183,12 @@ void Game::setup() {
 }
 
 void Game::execute() {
-    // TODO: Remove test stuff
-    if (!m_atlas.addTexture("grass.png")) {
-        spdlog::error("Could not load texture grass.png!");
-    }
-    if (!m_atlas.addTexture("sand.png")) {
-        spdlog::error("Could not load texture sand.png!");
-    }
-    if (!m_atlas.addTexture("sky.png")) {
-        spdlog::error("Could not load texture sky.png!");
-    }
-    if (!m_atlas.addTexture("menubackground.png")) {
-        spdlog::error("Could not load texture menubackground.png!");
-    }
-    if (!m_atlas.addTexture("player.png")) {
-        spdlog::error("Could not load texture player.png!");
-    }
-    if (!m_atlas.addTexture("button.png")) {
-        spdlog::error("Could not load texture button.png!");
-    }
+    loadTextures();
 
     // Get into the main menu
-    setState(new MainMenuState());
+    const float aspectRatio = static_cast<float>(m_win.getSize().x) /
+                              static_cast<float>(m_win.getSize().y);
+    setState(new MainMenuState(aspectRatio));
 
     sf::Clock frameTime;
     sf::Clock updateFpsTimer;
@@ -288,6 +290,10 @@ void Game::createDefaultSettings() {
     m_settings["controls"]["move_right"]     = sf::Keyboard::D;
     // Debug settings
     m_settings["debug"]["test_seed"] = 7582;
+}
+
+void Game::loadTextures() {
+    PHYSFS_enumerate("/textures", loadTextureCallback, NULL);
 }
 
 }

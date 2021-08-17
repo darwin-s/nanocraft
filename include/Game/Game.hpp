@@ -51,6 +51,7 @@ private:
     void execute();
     void loadSettings();
     void createDefaultSettings();
+    void loadTextures();
 
 private:
     static Game* m_inst; // Game instance

@@ -157,12 +157,20 @@ bool TextureAtlas::addTexture(const std::filesystem::path& path) {
 
 TextureAtlas::TextureInfo
     TextureAtlas::getTexture(const std::string& texture) const {
-    if (m_texInfo.find(texture) == m_texInfo.end()) {
-        spdlog::warn("Could not find texture {}! Using default one!", texture);
+    std::string actualPath;
+    if (texture != "default") {
+        actualPath = "/textures/" + texture;
+    } else {
+        actualPath = texture;
+    }
+
+    if (m_texInfo.find(actualPath) == m_texInfo.end()) {
+        spdlog::warn("Could not find texture {}! Using default one!",
+                     actualPath);
         return m_texInfo.at("default");
     }
 
-    return m_texInfo.at(texture);
+    return m_texInfo.at(actualPath);
 }
 
 unsigned int TextureAtlas::getTileSize() const {
