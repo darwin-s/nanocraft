@@ -32,6 +32,8 @@ public:
     void addWidget(Widget* w);
     void setFocus(Widget* w);
     sf::View& getView();
+    void setAspectRatio(float aspectRatio);
+    float getAspectRatio() const;
 
 protected:
     virtual void draw(sf::RenderTarget& target,
@@ -39,6 +41,7 @@ protected:
 
 private:
     bool m_shown;
+    float m_aspectRatio;
     sf::View m_view;
     std::vector<Widget*> m_widgets;
     Widget* m_focused;
