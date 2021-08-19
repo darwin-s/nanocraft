@@ -12,27 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NC_UI_PLAYERUI_HPP
-#define NC_UI_PLAYERUI_HPP
-
-#include <UI/UI.hpp>
-#include <UI/ImageWidget.hpp>
-#include <entt/entt.hpp>
+#include <Game/GameRegistry.hpp>
+#include <Game/Item.hpp>
 
 namespace nc {
 
-class PlayerUI : public UI {
-public:
-    PlayerUI();
-    void update() override;
-    void setPlayer(entt::const_handle m_player);
+GameRegistry::GameRegistry() {}
 
-private:
-    ImageWidget m_toolBar;
-    ImageWidget m_toolBarImages[10];
-    entt::const_handle m_player;
-};
-
+GameRegistry::~GameRegistry() {
+    for (auto& i : m_items) {
+        delete i.second;
+    }
 }
 
-#endif // !NC_UI_PLAYERUI_HPP
+void GameRegistry::registerItem(Item* item) {
+    m_items[item->getName()] = item;
+}
+
+Item* GameRegistry::getItem(const std::string& name) {
+    if (m_items.find(name) == m_items.end()) {
+        return nullptr;
+    }
+
+    return m_items[name];
+}
+
+}

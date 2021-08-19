@@ -18,8 +18,7 @@
 
 namespace nc {
 
-MainMenuState::MainMenuState(float aspectRatio) {
-    m_mainMenu.setAspectRatio(aspectRatio);
+MainMenuState::MainMenuState() {
     m_mainMenu.setShown(true);
 }
 

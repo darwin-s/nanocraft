@@ -22,7 +22,7 @@ namespace nc {
 
 class MainMenuState : public GameState {
 public:
-    explicit MainMenuState(float aspectRatio = 1.0f);
+    explicit MainMenuState();
     void perFrame() override;
     void handleEvent(sf::Event e) override;
     void update(float dt) override;

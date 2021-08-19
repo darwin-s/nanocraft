@@ -12,27 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NC_UI_PLAYERUI_HPP
-#define NC_UI_PLAYERUI_HPP
+#ifndef NC_GAME_ITEM_HPP
+#define NC_GAME_ITEM_HPP
 
-#include <UI/UI.hpp>
-#include <UI/ImageWidget.hpp>
-#include <entt/entt.hpp>
+#include <World/Tile.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <string>
 
 namespace nc {
 
-class PlayerUI : public UI {
+class Item {
 public:
-    PlayerUI();
-    void update() override;
-    void setPlayer(entt::const_handle m_player);
+    explicit Item(const std::string& name);
+    Item(const std::string& texture, const std::string& name);
+    void setTexture(const std::string& texture);
+    sf::Sprite& getSprite();
+    const sf::Sprite& getSprite() const;
+    virtual Tile* getPlaceableTile() const;
+    void setName(const std::string& name);
+    std::string getName() const;
 
 private:
-    ImageWidget m_toolBar;
-    ImageWidget m_toolBarImages[10];
-    entt::const_handle m_player;
+    sf::Sprite m_sprite;
+    std::string m_name;
 };
 
 }
 
-#endif // !NC_UI_PLAYERUI_HPP
+#endif // !NC_GAME_ITEM_HPP

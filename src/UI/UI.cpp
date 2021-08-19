@@ -18,8 +18,9 @@
 namespace nc {
 
 UI::UI()
-    : m_shown(false), m_aspectRatio(1.0f),
-      m_view(sf::FloatRect(0.0f, 0.0f, 1.0f, 1.0f)), m_focused(nullptr) {}
+    : m_shown(false),
+      m_view(sf::FloatRect(0.0f, 0.0f, REFERENCE_WIDTH, REFERENCE_HEIGHT)),
+      m_focused(nullptr) {}
 
 void UI::setShown(bool shown) {
     m_shown = shown;
@@ -51,14 +52,6 @@ void UI::setFocus(Widget* w) {
 
 sf::View& UI::getView() {
     return m_view;
-}
-
-void UI::setAspectRatio(const float aspectRatio) {
-    m_aspectRatio = aspectRatio;
-}
-
-float UI::getAspectRatio() const {
-    return m_aspectRatio;
 }
 
 void UI::draw(sf::RenderTarget& target, sf::RenderStates states) const {

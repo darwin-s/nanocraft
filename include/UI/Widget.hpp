@@ -28,12 +28,17 @@ class Widget : public sf::Drawable {
 public:
     explicit Widget(Widget* parent = nullptr);
     Widget* getParent();
+    void setParent(Widget* parent);
     bool getFocused() const;
     void setShown(bool show);
     bool getShown() const;
     sf::Sprite& getSprite();
     void setSize(float width, float height);
     void setSize(sf::Vector2f size);
+    sf::Vector2f getSize() const;
+    void setPosition(float x, float y);
+    void setPosition(sf::Vector2f pos);
+    sf::Vector2f getPosition() const;
     void setTexture(const std::string& texture);
 
 protected:

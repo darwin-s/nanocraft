@@ -93,7 +93,7 @@ entt::registry& Map::getRegistry() {
     return m_reg;
 }
 
-void Map::simulateWorld(float dt) {
+void Map::simulateWorld(const float dt) {
     // Generate chunks around players
     m_reg.view<PlayerComponent, Object>().each([=](auto& obj) {
         constexpr int xDir[] = {0, -1, 0, 1, -1, 1, -1, 0, 1};
@@ -110,6 +110,15 @@ void Map::simulateWorld(float dt) {
             }
         }
     });
+}
+
+Tile& Map::getTile(unsigned int xPos, unsigned int yPos) {
+    sf::Vector2u cp = getChunkPos(xPos, yPos);
+    Chunk* c = getChunk(cp);
+    xPos -= cp.x * Chunk::CHUNK_SIZE;
+    yPos -= cp.y * Chunk::CHUNK_SIZE;
+
+    return c->getTile(xPos, yPos);
 }
 
 }

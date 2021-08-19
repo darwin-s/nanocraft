@@ -25,6 +25,10 @@ namespace nc {
 
 class UI : public sf::Drawable {
 public:
+    static constexpr float REFERENCE_WIDTH = 640.0f;
+    static constexpr float REFERENCE_HEIGHT = 360.0f;
+
+public:
     UI();
     void setShown(bool shown);
     bool getShown() const;
@@ -32,8 +36,6 @@ public:
     void addWidget(Widget* w);
     void setFocus(Widget* w);
     sf::View& getView();
-    void setAspectRatio(float aspectRatio);
-    float getAspectRatio() const;
     virtual void update() = 0;
 
 protected:
@@ -42,7 +44,6 @@ protected:
 
 private:
     bool m_shown;
-    float m_aspectRatio;
     sf::View m_view;
     std::vector<Widget*> m_widgets;
     Widget* m_focused;

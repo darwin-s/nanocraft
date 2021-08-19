@@ -12,27 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NC_UI_PLAYERUI_HPP
-#define NC_UI_PLAYERUI_HPP
+#ifndef NC_GAME_ITEMSTACK_HPP
+#define NC_GAME_ITEMSTACK_HPP
 
-#include <UI/UI.hpp>
-#include <UI/ImageWidget.hpp>
-#include <entt/entt.hpp>
+#include <Game/Item.hpp>
 
 namespace nc {
 
-class PlayerUI : public UI {
+class ItemStack {
 public:
-    PlayerUI();
-    void update() override;
-    void setPlayer(entt::const_handle m_player);
+    ItemStack();
+    void setItem(Item* item, unsigned int count = 1);
+    Item* getItem();
+    const Item* getItem() const;
+    unsigned int getCount() const;
+    void setCount(unsigned int count);
+    bool isEmpty() const;
 
 private:
-    ImageWidget m_toolBar;
-    ImageWidget m_toolBarImages[10];
-    entt::const_handle m_player;
+    Item* m_item;
+    unsigned int m_count;
 };
 
 }
 
-#endif // !NC_UI_PLAYERUI_HPP
+#endif // !NC_GAME_ITEMSTACK_HPP

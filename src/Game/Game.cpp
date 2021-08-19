@@ -108,6 +108,10 @@ sf::RenderWindow& Game::getWindow() {
     return m_win;
 }
 
+GameRegistry& Game::getRegistry() {
+    return m_reg;
+}
+
 Game* Game::getInstance() {
     return m_inst;
 }
@@ -186,9 +190,7 @@ void Game::execute() {
     loadTextures();
 
     // Get into the main menu
-    const float aspectRatio = static_cast<float>(m_win.getSize().x) /
-                              static_cast<float>(m_win.getSize().y);
-    setState(new MainMenuState(aspectRatio));
+    setState(new MainMenuState());
 
     sf::Clock frameTime;
     sf::Clock updateFpsTimer;

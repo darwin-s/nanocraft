@@ -25,6 +25,10 @@ Widget* Widget::getParent() {
     return m_parent;
 }
 
+void Widget::setParent(Widget* parent) {
+    m_parent = parent;
+}
+
 bool Widget::getFocused() const {
     return m_focused;
 }
@@ -42,8 +46,7 @@ sf::Sprite& Widget::getSprite() {
 }
 
 void Widget::setSize(float width, float height) {
-    const sf::IntRect& texRect = m_sprite.getTextureRect();
-
+    sf::IntRect texRect = m_sprite.getTextureRect();
     m_sprite.setScale(width / static_cast<float>(texRect.width),
                       height / static_cast<float>(texRect.height));
 }
@@ -52,14 +55,40 @@ void Widget::setSize(sf::Vector2f size) {
     setSize(size.x, size.y);
 }
 
+sf::Vector2f Widget::getSize() const {
+    const sf::IntRect& texRect = m_sprite.getTextureRect();
+    sf::Vector2f s{static_cast<float>(texRect.width),
+                   static_cast<float>(texRect.height)};
+
+    s.x *= m_sprite.getScale().x;
+    s.y *= m_sprite.getScale().y;
+
+    return s;
+}
+
+void Widget::setPosition(float x, float y) {
+    if (m_parent == nullptr) {
+        m_sprite.setPosition(x, y);
+    } else {
+        m_sprite.setPosition(m_parent->m_sprite.getPosition().x + x,
+                             m_parent->m_sprite.getPosition().y + y);
+    }
+}
+
+void Widget::setPosition(sf::Vector2f pos) {
+    setPosition(pos.x, pos.y);
+}
+
+sf::Vector2f Widget::getPosition() const {
+    return m_sprite.getPosition();
+}
+
 void Widget::setTexture(const std::string& texture) {
     TextureAtlas::TextureInfo inf =
         Game::getInstance()->getTextureAtlas().getTexture(texture);
 
-    sf::Sprite& sprite = getSprite();
-    sprite.setTexture(*inf.texture);
-    sprite.setTextureRect(inf.textureRect);
-    setSize(1.0f, 1.0f);
+    m_sprite.setTexture(*inf.texture);
+    m_sprite.setTextureRect(inf.textureRect);
 }
 
 void Widget::setFocused(bool focus) {
@@ -71,7 +100,9 @@ UI* Widget::getUI() {
 }
 
 void Widget::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    target.draw(m_sprite, states);
+    if (m_shown) {
+        target.draw(m_sprite, states);
+    }
 }
 
 }

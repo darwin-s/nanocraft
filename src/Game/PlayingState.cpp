@@ -19,6 +19,7 @@
 #include <Components/PlayerInputComponent.hpp>
 #include <Components/PlayerComponent.hpp>
 #include <Components/VelocityComponent.hpp>
+#include <Components/InventoryComponent.hpp>
 #include <General/Physics.hpp>
 
 namespace nc {
@@ -35,11 +36,15 @@ PlayingState::PlayingState()
     reg.emplace<PlayerInputComponent>(m_player);
     reg.emplace<VelocityComponent>(m_player);
     reg.emplace<sf::View*>(m_player, &Game::getInstance()->getView());
+    reg.emplace<InventoryComponent>(m_player, 10);
     reg.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
     reg.get<Object>(m_player).setPosition(sf::Vector2f(16400.0f, 16400.0f));
     reg.get<sf::View*>(m_player)->setCenter(16400.0f, 16400.0f);
-    m_playerUI.setAspectRatio(16.0f / 9.0f);
+    m_playerUI.setPlayer({reg, m_player});
     m_playerUI.setShown(true);
+    Item* i = new Item("grass.png", "grass");
+    Game::getInstance()->getRegistry().registerItem(i);
+    reg.get<InventoryComponent>(m_player).inventory[0].setItem(i, 5);
 }
 
 PlayingState::~PlayingState() {
@@ -55,6 +60,24 @@ void PlayingState::perFrame() {
 void PlayingState::handleEvent(sf::Event e) {
     InputHandler::handleInput(e, m_map->getRegistry());
     m_playerUI.handleEvent(e);
+
+    if (e.type == sf::Event::MouseButtonReleased) {
+        if (e.mouseButton.button == sf::Mouse::Left) {
+            sf::Vector2i mousePos{e.mouseButton.x, e.mouseButton.y};
+            sf::Vector2f worldPos =
+                Game::getInstance()->getWindow().mapPixelToCoords(
+                    mousePos, Game::getInstance()->getView());
+            m_map->getTile(worldPos.x, worldPos.y).setTexture("grass.png");
+            m_map->getChunk(Map::getChunkPos(worldPos))->generateTexture();
+        } else if (e.mouseButton.button == sf::Mouse::Right) {
+            sf::Vector2i mousePos{e.mouseButton.x, e.mouseButton.y};
+            sf::Vector2f worldPos =
+                Game::getInstance()->getWindow().mapPixelToCoords(
+                    mousePos, Game::getInstance()->getView());
+            m_map->getTile(worldPos.x, worldPos.y).setTexture("sand.png");
+            m_map->getChunk(Map::getChunkPos(worldPos))->generateTexture();
+        }
+    }
 }
 
 void PlayingState::update(const float dt) {

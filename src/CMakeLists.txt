@@ -9,10 +9,14 @@ set(NC_INCLUDES
         ../include/Components/VelocityComponent.hpp
         ../include/Components/PlayerComponent.hpp
         ../include/Components/PlayerInputComponent.hpp
+        ../include/Components/InventoryComponent.hpp
         ../include/Game/Game.hpp
         ../include/Game/GameState.hpp
         ../include/Game/MainMenuState.hpp
         ../include/Game/PlayingState.hpp
+        ../include/Game/GameRegistry.hpp
+        ../include/Game/Item.hpp
+        ../include/Game/ItemStack.hpp
         ../include/General/TextureAtlas.hpp
         ../include/General/Object.hpp
         ../include/General/InputHandler.hpp
@@ -31,10 +35,14 @@ set(NC_INCLUDES
 
 set(NC_SOURCES
         ${imgui_sfml_src}
+        Components/InventoryComponent.cpp
         Game/Game.cpp
         Game/GameState.cpp
         Game/MainMenuState.cpp
         Game/PlayingState.cpp
+        Game/GameRegistry.cpp
+        Game/Item.cpp
+        Game/ItemStack.cpp
         General/main.cpp
         General/TextureAtlas.cpp
         General/Object.cpp

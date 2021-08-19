@@ -24,27 +24,17 @@ MainMenu::MainMenu()
     addWidget(&m_background);
     addWidget(&m_startGame);
 
-    const float screenVerticalSize =
-        static_cast<float>(m_background.getSprite().getTextureRect().width) /
-        getAspectRatio();
-    const float verticalSize =
-        static_cast<float>(m_background.getSprite().getTextureRect().height) /
-        screenVerticalSize;
-    m_background.setSize(1.0f, std::max(1.0f, verticalSize));
-    m_startGame.getSprite().setPosition(0.4f, 0.55f);
-    m_startGame.setSize(0.2f, 0.1f);
+    m_background.setSize(UI::REFERENCE_WIDTH, UI::REFERENCE_HEIGHT);
+    m_startGame.setPosition(0.4f * UI::REFERENCE_WIDTH,
+                            0.55f * UI::REFERENCE_HEIGHT);
+    m_startGame.setSize(0.2f * UI::REFERENCE_WIDTH,
+                        0.1f * UI::REFERENCE_HEIGHT);
     m_startGame.setOnClick(
         []() { Game::getInstance()->setState(new PlayingState()); });
 }
 
 void MainMenu::update() {
-    const float screenVerticalSize =
-        static_cast<float>(m_background.getSprite().getTextureRect().width) /
-        getAspectRatio();
-    const float verticalSize =
-        static_cast<float>(m_background.getSprite().getTextureRect().height) /
-        screenVerticalSize;
-    m_background.setSize(1.0f, std::max(1.0f, verticalSize));
+    
 }
 
 }

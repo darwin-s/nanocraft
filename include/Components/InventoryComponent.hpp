@@ -12,27 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NC_UI_PLAYERUI_HPP
-#define NC_UI_PLAYERUI_HPP
+#ifndef NC_COMPONENTS_INVENTORYCOMPONENT_HPP
+#define NC_COMPONENTS_INVENTORYCOMPONENT_HPP
 
-#include <UI/UI.hpp>
-#include <UI/ImageWidget.hpp>
-#include <entt/entt.hpp>
+#include <Game/ItemStack.hpp>
 
 namespace nc {
 
-class PlayerUI : public UI {
+class InventoryComponent {
 public:
-    PlayerUI();
-    void update() override;
-    void setPlayer(entt::const_handle m_player);
+    explicit InventoryComponent(unsigned int size);
+    ~InventoryComponent();
 
-private:
-    ImageWidget m_toolBar;
-    ImageWidget m_toolBarImages[10];
-    entt::const_handle m_player;
+    ItemStack* inventory;
+    unsigned int size;
 };
 
 }
 
-#endif // !NC_UI_PLAYERUI_HPP
+#endif // !NC_COMPONENTS_INVENTORYCOMPONENT_HPP

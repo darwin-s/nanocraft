@@ -17,6 +17,7 @@
 
 #include <General/TextureAtlas.hpp>
 #include <Game/GameState.hpp>
+#include <Game/GameRegistry.hpp>
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
@@ -43,6 +44,7 @@ public:
     void setState(GameState* newState);
     GameState* getState() const;
     sf::RenderWindow& getWindow();
+    GameRegistry& getRegistry();
 
     static Game* getInstance();
 
@@ -62,6 +64,7 @@ private:
 
     GameState* m_gameState; // Game state object
     GameState* m_requestedState; // Requested game state
+    GameRegistry m_reg; // Game registry
 
     nlohmann::json m_settings;
     
