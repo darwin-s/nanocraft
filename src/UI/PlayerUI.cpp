@@ -30,7 +30,7 @@ PlayerUI::PlayerUI()
 
     for (unsigned int i = 0; i < 9; i++) {
         m_toolBarImages[i].setParent(&m_toolBar);
-        m_toolBarImages[i].setPosition(static_cast<float>(i) * 24.0f + 9.0f, 9.0f);
+        m_toolBarImages[i].setPosition(static_cast<float>(i) * 25.0f + 9.0f, 9.0f);
         m_toolBarImages[i].setShown(false);
         addWidget(&m_toolBarImages[i]);
     }
