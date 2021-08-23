@@ -17,6 +17,7 @@
 
 #include <Game/GameState.hpp>
 #include <UI/PlayerUI.hpp>
+#include <UI/PlayerInventory.hpp>
 #include <World/Map.hpp>
 #include <World/OverworldGenerator.hpp>
 #include <entt/entt.hpp>
@@ -37,6 +38,7 @@ private:
     Map* m_map;
     entt::entity m_player;
     PlayerUI m_playerUI;
+    PlayerInventory m_playerInventory;
 };
 
 }

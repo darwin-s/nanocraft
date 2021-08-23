@@ -27,8 +27,8 @@ MainMenu::MainMenu()
     m_background.setSize(UI::REFERENCE_WIDTH, UI::REFERENCE_HEIGHT);
     m_startGame.setPosition(0.4f * UI::REFERENCE_WIDTH,
                             0.55f * UI::REFERENCE_HEIGHT);
-    m_startGame.setSize(0.2f * UI::REFERENCE_WIDTH,
-                        0.1f * UI::REFERENCE_HEIGHT);
+    m_startGame.setTexture(ButtonWidget::HOVERED, "button_hover.png");
+    m_startGame.setTexture(ButtonWidget::PRESSED, "button_press.png");
     m_startGame.setOnClick(
         []() { Game::getInstance()->setState(new PlayingState()); });
 }

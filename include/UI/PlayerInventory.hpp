@@ -12,32 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NC_UI_PLAYERUI_HPP
-#define NC_UI_PLAYERUI_HPP
+#ifndef NC_UI_PLAYERINVENTORY_HPP
+#define NC_UI_PLAYERINVENTORY_HPP
 
 #include <UI/UI.hpp>
 #include <UI/ImageWidget.hpp>
-#include <Game/ItemStack.hpp>
 #include <entt/entt.hpp>
 
 namespace nc {
 
-class PlayerUI : public UI {
+class PlayerInventory : public UI {
 public:
-    PlayerUI();
+    static constexpr unsigned int PLAYER_INV_ROWS = 5;
+    static constexpr unsigned int PLAYER_INV_COLS = 9;
+    static constexpr unsigned int PLAYER_INV_SIZE = PLAYER_INV_ROWS * PLAYER_INV_COLS;
+
+public:
+    PlayerInventory();
     void update() override;
-    void setPlayer(entt::const_handle m_player);
-    void selectHotbarItem(unsigned int pos);
-    unsigned int getSelectedHotbarItem() const;
+    void setPlayer(entt::handle m_player);
 
 private:
-    ImageWidget m_toolBar;
-    ImageWidget m_toolBarImages[9];
-    ImageWidget m_selectedOverlay;
-    unsigned int m_selectedPos;
-    entt::const_handle m_player;
+    ImageWidget m_invScren;
+    ImageWidget m_itemImages[PLAYER_INV_SIZE];
+    entt::handle m_player;
 };
 
 }
 
-#endif // !NC_UI_PLAYERUI_HPP
+#endif // !NC_UI_PLAYERINVENTORY_HPP

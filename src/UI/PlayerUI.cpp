@@ -18,7 +18,8 @@
 
 namespace nc {
 
-PlayerUI::PlayerUI() : m_toolBar("toolbar.png") {
+PlayerUI::PlayerUI()
+    : m_toolBar("toolbar.png"), m_selectedOverlay("toolbar_select.png") {
     const float screenMiddleX = UI::REFERENCE_WIDTH / 2.0f;
     const float halfWidth     = m_toolBar.getSize().x / 2.0f;
     const float height        = m_toolBar.getSize().y;
@@ -27,20 +28,24 @@ PlayerUI::PlayerUI() : m_toolBar("toolbar.png") {
                           UI::REFERENCE_HEIGHT - height);
     addWidget(&m_toolBar);
 
-    for (unsigned int i = 0; i < 10; i++) {
+    for (unsigned int i = 0; i < 9; i++) {
         m_toolBarImages[i].setParent(&m_toolBar);
-        m_toolBarImages[i].setPosition((float)i * 16.0f + 4, 4.0f);
+        m_toolBarImages[i].setPosition(static_cast<float>(i) * 24.0f + 9.0f, 9.0f);
         m_toolBarImages[i].setShown(false);
         addWidget(&m_toolBarImages[i]);
     }
+
+    m_selectedOverlay.setParent(&m_toolBar);
+    addWidget(&m_selectedOverlay);
+    selectHotbarItem(0);
 }
 
 void PlayerUI::update() {
     if (m_player.valid()) {
         const InventoryComponent& inv = m_player.get<InventoryComponent>();
 
-        for (int i = 0; i < 10; i++) {
-            Item* itm = inv.inventory[i].getItem();
+        for (int i = 0; i < 9; i++) {
+            Item* itm = inv.inventory[4 * 9 + i].getItem();
             if (itm != nullptr) {
                 const sf::Texture* itemTex = itm->getSprite().getTexture();
 
@@ -61,6 +66,20 @@ void PlayerUI::update() {
 
 void PlayerUI::setPlayer(entt::const_handle player) {
     m_player = player;
+}
+
+void PlayerUI::selectHotbarItem(unsigned int pos) {
+    if (pos >= 9) {
+        pos = 8;
+    }
+
+    m_selectedPos = pos;
+    m_selectedOverlay.setPosition(static_cast<float>(pos) * 25.0f + 4.0f,
+                                  4.0f);
+}
+
+unsigned int PlayerUI::getSelectedHotbarItem() const {
+    return m_selectedPos;
 }
 
 }

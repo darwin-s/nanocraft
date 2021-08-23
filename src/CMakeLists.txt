@@ -27,6 +27,7 @@ set(NC_INCLUDES
         ../include/UI/MainMenu.hpp
         ../include/UI/ButtonWidget.hpp
         ../include/UI/PlayerUI.hpp
+        ../include/UI/PlayerInventory.hpp
         ../include/World/Map.hpp
         ../include/World/Tile.hpp
         ../include/World/Chunk.hpp
@@ -54,6 +55,7 @@ set(NC_SOURCES
         UI/MainMenu.cpp
         UI/ButtonWidget.cpp
         UI/PlayerUI.cpp
+        UI/PlayerInventory.cpp
         World/Map.cpp
         World/Tile.cpp
         World/Chunk.cpp

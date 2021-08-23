@@ -19,19 +19,59 @@
 
 namespace nc {
 
-ButtonWidget::ButtonWidget(Widget* parent) : Widget(parent) {}
+ButtonWidget::ButtonWidget(Widget* parent) : Widget(parent), m_state(NORMAL) {
+    for (int s = 0; s < STATE_NO; s++) {
+        setTexture(static_cast<State>(s), "default");
+    }
+
+    Widget::setTexture("default");
+}
 
 ButtonWidget::ButtonWidget(const std::string& texture, Widget* parent)
-    : Widget(parent) {
-    setTexture(texture);
+    : Widget(parent), m_state(NORMAL) {
+    for (int s = 0; s < STATE_NO; s++) {
+        setTexture(static_cast<State>(s), texture);
+    }
+
+    Widget::setTexture(texture);
 }
 
 void ButtonWidget::setOnClick(std::function<void()> func) {
     m_onClick = func;
 }
 
+void ButtonWidget::setTexture(State state, const std::string& texture) {
+    TextureAtlas::TextureInfo inf =
+        Game::getInstance()->getTextureAtlas().getTexture(texture);
+
+    m_stateTextures[state].tex     = inf.texture;
+    m_stateTextures[state].texRect = inf.textureRect;
+}
+
 void ButtonWidget::handleEvent(sf::Event e) {
-    if (e.type == sf::Event::MouseButtonPressed) {
+    if (e.type == sf::Event::MouseMoved) {
+        sf::RenderWindow& win = Game::getInstance()->getWindow();
+        UI* ui                = getUI();
+        sf::Vector2i mousePos(e.mouseMove.x, e.mouseMove.y);
+        sf::Vector2f pos;
+        if (ui != nullptr) {
+            pos = win.mapPixelToCoords(mousePos, ui->getView());
+        } else {
+            pos = win.mapPixelToCoords(mousePos);
+        }
+
+        if (getSprite().getGlobalBounds().contains(pos)) {
+            if (m_state != PRESSED) {
+                m_state = HOVERED;
+                getSprite().setTexture(*m_stateTextures[m_state].tex);
+                getSprite().setTextureRect(m_stateTextures[m_state].texRect);
+            }
+        } else {
+            m_state = NORMAL;
+            getSprite().setTexture(*m_stateTextures[m_state].tex);
+            getSprite().setTextureRect(m_stateTextures[m_state].texRect);
+        }
+    } else if (e.type == sf::Event::MouseButtonPressed) {
         if (e.mouseButton.button == sf::Mouse::Left) {
             sf::RenderWindow& win = Game::getInstance()->getWindow();
             UI* ui                = getUI();
@@ -42,6 +82,28 @@ void ButtonWidget::handleEvent(sf::Event e) {
             } else {
                 pos = win.mapPixelToCoords(mousePos);
             }
+
+            if (getSprite().getGlobalBounds().contains(pos)) {
+                m_state = PRESSED;
+                getSprite().setTexture(*m_stateTextures[m_state].tex);
+                getSprite().setTextureRect(m_stateTextures[m_state].texRect);
+            }
+        }
+    } else if (e.type == sf::Event::MouseButtonReleased) {
+        if (e.mouseButton.button == sf::Mouse::Left) {
+            sf::RenderWindow& win = Game::getInstance()->getWindow();
+            UI* ui                = getUI();
+            sf::Vector2i mousePos(e.mouseButton.x, e.mouseButton.y);
+            sf::Vector2f pos;
+            if (ui != nullptr) {
+                pos = win.mapPixelToCoords(mousePos, ui->getView());
+            } else {
+                pos = win.mapPixelToCoords(mousePos);
+            }
+
+            m_state = NORMAL;
+            getSprite().setTexture(*m_stateTextures[m_state].tex);
+            getSprite().setTextureRect(m_stateTextures[m_state].texRect);
 
             if (getSprite().getGlobalBounds().contains(pos)) {
                 if (m_onClick) {
