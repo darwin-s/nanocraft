@@ -100,6 +100,3 @@ target_include_directories(nanocraft PUBLIC
 target_compile_definitions(nanocraft PRIVATE "$<$<CONFIG:DEBUG>:NC_DEBUG>")
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/../include" PREFIX "Header Files" FILES ${NC_INCLUDES})
-
-install(TARGETS nanocraft
-        RUNTIME DESTINATION bin)

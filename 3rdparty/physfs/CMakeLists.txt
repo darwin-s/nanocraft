@@ -213,11 +213,11 @@ if(PHYSFS_BUILD_TEST)
     set(PHYSFS_INSTALL_TARGETS ${PHYSFS_INSTALL_TARGETS} ";test_physfs")
 endif()
 
-install(TARGETS ${PHYSFS_INSTALL_TARGETS}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib${LIB_SUFFIX}
-        ARCHIVE DESTINATION lib${LIB_SUFFIX})
-install(FILES src/physfs.h DESTINATION include)
+#install(TARGETS ${PHYSFS_INSTALL_TARGETS}
+#        RUNTIME DESTINATION bin
+#        LIBRARY DESTINATION lib${LIB_SUFFIX}
+#        ARCHIVE DESTINATION lib${LIB_SUFFIX})
+#install(FILES src/physfs.h DESTINATION include)
 
 #find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -269,10 +269,10 @@ if(NOT MSVC)
         "extras/physfs.pc"
         @ONLY
     )
-    install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/extras/physfs.pc"
-        DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
-    )
+    #install(
+    #    FILES "${CMAKE_CURRENT_BINARY_DIR}/extras/physfs.pc"
+    #    DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
+    #)
 endif()
 
 macro(message_bool_option _NAME _VALUE)

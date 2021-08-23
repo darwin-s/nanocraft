@@ -5,3 +5,6 @@ project(nanocraft
 
 add_subdirectory(3rdparty)
 add_subdirectory(src)
+
+install(TARGETS nanocraft DESTINATION nanocraft)
+install(DIRECTORY res/data DESTINATION nanocraft)
