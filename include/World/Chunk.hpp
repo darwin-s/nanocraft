@@ -31,7 +31,7 @@ public:
 public:
     Chunk(unsigned int xPos, unsigned int yPos);
     Tile& getTile(unsigned int x, unsigned  int y);
-    void generateTexture();
+    void setDirty();
     sf::Vector2u getPosition() const;
 
 protected:
@@ -42,7 +42,8 @@ private:
     unsigned int m_xPos;
     unsigned int m_yPos;
 
-    sf::RenderTexture m_tex; // Texture of the chunk
+    mutable bool m_dirty;
+    mutable sf::RenderTexture m_tex; // Texture of the chunk
     sf::Sprite m_sprite; // Sprite for the chunk
 };
 

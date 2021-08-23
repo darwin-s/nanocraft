@@ -36,15 +36,18 @@ PlayingState::PlayingState()
     reg.emplace<PlayerInputComponent>(m_player);
     reg.emplace<VelocityComponent>(m_player);
     reg.emplace<sf::View*>(m_player, &Game::getInstance()->getView());
-    reg.emplace<InventoryComponent>(m_player, 10);
+    reg.emplace<InventoryComponent>(m_player, PlayerInventory::PLAYER_INV_SIZE);
     reg.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
     reg.get<Object>(m_player).setPosition(sf::Vector2f(16400.0f, 16400.0f));
     reg.get<sf::View*>(m_player)->setCenter(16400.0f, 16400.0f);
+    m_playerInventory.setPlayer({reg, m_player});
     m_playerUI.setPlayer({reg, m_player});
+    m_playerInventory.setShown(false);
     m_playerUI.setShown(true);
+    // TODO delete this
     Item* i = new Item("grass.png", "grass");
     Game::getInstance()->getRegistry().registerItem(i);
-    reg.get<InventoryComponent>(m_player).inventory[0].setItem(i, 5);
+    reg.get<InventoryComponent>(m_player).inventory[4 * 9].setItem(i, 5);
 }
 
 PlayingState::~PlayingState() {
@@ -55,27 +58,54 @@ PlayingState::~PlayingState() {
 void PlayingState::perFrame() {
     InputHandler::pollInput(m_map->getRegistry());
     m_playerUI.update();
+    m_playerInventory.update();
 }
 
 void PlayingState::handleEvent(sf::Event e) {
     InputHandler::handleInput(e, m_map->getRegistry());
     m_playerUI.handleEvent(e);
+    m_playerInventory.handleEvent(e);
 
+    // TODO: Remove
     if (e.type == sf::Event::MouseButtonReleased) {
         if (e.mouseButton.button == sf::Mouse::Left) {
-            sf::Vector2i mousePos{e.mouseButton.x, e.mouseButton.y};
-            sf::Vector2f worldPos =
-                Game::getInstance()->getWindow().mapPixelToCoords(
-                    mousePos, Game::getInstance()->getView());
-            m_map->getTile(worldPos.x, worldPos.y).setTexture("grass.png");
-            m_map->getChunk(Map::getChunkPos(worldPos))->generateTexture();
+            ItemStack& s =
+                m_map->getRegistry()
+                    .get<InventoryComponent>(m_player)
+                    .inventory[9 * 4 + m_playerUI.getSelectedHotbarItem()];
+            if (!s.isEmpty()) {
+                sf::Vector2i mousePos{e.mouseButton.x, e.mouseButton.y};
+                sf::Vector2f worldPos =
+                    Game::getInstance()->getWindow().mapPixelToCoords(
+                        mousePos, Game::getInstance()->getView());
+                m_map->getTile(worldPos.x, worldPos.y)->setTexture("grass_tile.png");
+                m_map->updateTile(worldPos.x, worldPos.y);
+                m_map->getChunk(Map::getChunkPos(worldPos))->setDirty();
+                s.setCount(s.getCount() - 1);
+            }
         } else if (e.mouseButton.button == sf::Mouse::Right) {
-            sf::Vector2i mousePos{e.mouseButton.x, e.mouseButton.y};
-            sf::Vector2f worldPos =
-                Game::getInstance()->getWindow().mapPixelToCoords(
-                    mousePos, Game::getInstance()->getView());
-            m_map->getTile(worldPos.x, worldPos.y).setTexture("sand.png");
-            m_map->getChunk(Map::getChunkPos(worldPos))->generateTexture();
+            ItemStack& s =
+                m_map->getRegistry()
+                    .get<InventoryComponent>(m_player)
+                    .inventory[9 * 4 + m_playerUI.getSelectedHotbarItem()];
+            if (s.isEmpty()) {
+                s.setItem(Game::getInstance()->getRegistry().getItem("grass"));
+            } else {
+                s.setCount(s.getCount() + 1);
+            }
+        }
+    } else if (e.type == sf::Event::KeyReleased) {
+        if (e.key.code == sf::Keyboard::E) {
+            m_playerInventory.setShown(!m_playerInventory.getShown());
+        }
+    } else if (e.type == sf::Event::MouseWheelScrolled) {
+        if (e.mouseWheelScroll.delta > 0.0f) {
+            m_playerUI.selectHotbarItem(m_playerUI.getSelectedHotbarItem() + 1);
+        } else {
+            if (m_playerUI.getSelectedHotbarItem() > 0) {
+                m_playerUI.selectHotbarItem(m_playerUI.getSelectedHotbarItem() -
+                                            1);
+            }
         }
     }
 }
@@ -136,6 +166,7 @@ void PlayingState::draw(sf::RenderWindow& win) {
     win.draw(m_map->getRegistry().get<Object>(m_player));
     // Draw ui
     win.draw(m_playerUI);
+    win.draw(m_playerInventory);
 }
 
 }

@@ -51,7 +51,7 @@ void OverworldGenerator::makeLandscape(unsigned int x, unsigned int y,
     if (noiseVal < 0.0f) {
         chunk->getTile(x, y).setTexture("sand.png");
     } else {
-        chunk->getTile(x, y).setTexture("grass.png");
+        chunk->getTile(x, y).setTexture("grass_tile.png");
     }
 }
 

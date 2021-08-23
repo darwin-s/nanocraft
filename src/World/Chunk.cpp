@@ -20,7 +20,7 @@
 namespace nc {
 
 Chunk::Chunk(const unsigned int xPos, const unsigned int yPos)
-    : m_xPos(xPos), m_yPos(yPos) {
+    : m_xPos(xPos), m_yPos(yPos), m_dirty(true) {
     const unsigned int tileSize =
         Game::getInstance()->getTextureAtlas().getTileSize();
     m_tex.create(CHUNK_SIZE * tileSize, CHUNK_SIZE * tileSize);
@@ -41,16 +41,8 @@ Tile& Chunk::getTile(const unsigned int x, const unsigned int y) {
     return m_tiles[y][x];
 }
 
-void Chunk::generateTexture() {
-    m_tex.clear(sf::Color::Yellow);
-    
-    for (auto& tileRow : m_tiles) {
-        for (auto& tile : tileRow) {
-            m_tex.draw(tile);
-        }
-    }
-    
-    m_tex.display();
+void Chunk::setDirty() {
+    m_dirty = true;
 }
 
 sf::Vector2u Chunk::getPosition() const {
@@ -58,6 +50,20 @@ sf::Vector2u Chunk::getPosition() const {
 }
 
 void Chunk::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    if (m_dirty) {
+        m_tex.clear(sf::Color::Yellow);
+    
+        for (const auto& tileRow : m_tiles) {
+            for (const auto& tile : tileRow) {
+                m_tex.draw(tile);
+            }
+        }
+    
+        m_tex.display();
+
+        m_dirty = false;
+    }
+
     target.draw(m_sprite);
 }
 

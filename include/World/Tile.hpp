@@ -20,15 +20,19 @@
 
 namespace nc {
 
+class Map;
+
 class Tile : public sf::Sprite {
 public:
     Tile();
     explicit Tile(const std::string& texture);
     void setTexture(const std::string& texture);
     unsigned int getSize() const;
+    void update(unsigned int posX, unsigned int posY, Map* currentMap);
 
 private:
     unsigned int m_size;
+    static sf::IntRect m_textureRects[16];
 };
 
 }
