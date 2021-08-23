@@ -41,11 +41,8 @@ void ButtonWidget::setOnClick(std::function<void()> func) {
 }
 
 void ButtonWidget::setTexture(State state, const std::string& texture) {
-    TextureAtlas::TextureInfo inf =
-        Game::getInstance()->getTextureAtlas().getTexture(texture);
-
-    m_stateTextures[state].tex     = inf.texture;
-    m_stateTextures[state].texRect = inf.textureRect;
+    m_stateTextures[state] =
+        &Game::getInstance()->getTextureAtlas().getTexture(texture);
 }
 
 void ButtonWidget::handleEvent(sf::Event e) {
@@ -63,13 +60,11 @@ void ButtonWidget::handleEvent(sf::Event e) {
         if (getSprite().getGlobalBounds().contains(pos)) {
             if (m_state != PRESSED) {
                 m_state = HOVERED;
-                getSprite().setTexture(*m_stateTextures[m_state].tex);
-                getSprite().setTextureRect(m_stateTextures[m_state].texRect);
+                getSprite().setTexture(*m_stateTextures[m_state]);
             }
         } else {
             m_state = NORMAL;
-            getSprite().setTexture(*m_stateTextures[m_state].tex);
-            getSprite().setTextureRect(m_stateTextures[m_state].texRect);
+            getSprite().setTexture(*m_stateTextures[m_state]);
         }
     } else if (e.type == sf::Event::MouseButtonPressed) {
         if (e.mouseButton.button == sf::Mouse::Left) {
@@ -85,8 +80,7 @@ void ButtonWidget::handleEvent(sf::Event e) {
 
             if (getSprite().getGlobalBounds().contains(pos)) {
                 m_state = PRESSED;
-                getSprite().setTexture(*m_stateTextures[m_state].tex);
-                getSprite().setTextureRect(m_stateTextures[m_state].texRect);
+                getSprite().setTexture(*m_stateTextures[m_state]);
             }
         }
     } else if (e.type == sf::Event::MouseButtonReleased) {
@@ -102,8 +96,7 @@ void ButtonWidget::handleEvent(sf::Event e) {
             }
 
             m_state = NORMAL;
-            getSprite().setTexture(*m_stateTextures[m_state].tex);
-            getSprite().setTextureRect(m_stateTextures[m_state].texRect);
+            getSprite().setTexture(*m_stateTextures[m_state]);
 
             if (getSprite().getGlobalBounds().contains(pos)) {
                 if (m_onClick) {

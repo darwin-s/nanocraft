@@ -38,15 +38,9 @@ protected:
     void update() override;
 
 private:
-    struct StateTexture {
-        sf::Texture* tex;
-        sf::IntRect texRect;
-    };
-
-private:
     std::function<void()> m_onClick;
     State m_state;
-    std::array<StateTexture, STATE_NO> m_stateTextures;
+    std::array<const sf::Texture*, STATE_NO> m_stateTextures;
 };
 
 }

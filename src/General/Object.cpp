@@ -29,10 +29,8 @@ Object::Object(const std::string& texture, sf::Vector2u size)
 }
 
 void Object::setTexture(const std::string& texture) {
-    TextureAtlas::TextureInfo inf =
-        Game::getInstance()->getTextureAtlas().getTexture(texture);
-    sf::Sprite::setTexture(*inf.texture);
-    sf::Sprite::setTextureRect(inf.textureRect);
+    sf::Sprite::setTexture(
+        Game::getInstance()->getTextureAtlas().getTexture(texture));
 }
 
 sf::Vector2u Object::getSize() const {

@@ -84,11 +84,8 @@ sf::Vector2f Widget::getPosition() const {
 }
 
 void Widget::setTexture(const std::string& texture) {
-    TextureAtlas::TextureInfo inf =
-        Game::getInstance()->getTextureAtlas().getTexture(texture);
-
-    m_sprite.setTexture(*inf.texture);
-    m_sprite.setTextureRect(inf.textureRect);
+    m_sprite.setTexture(
+        Game::getInstance()->getTextureAtlas().getTexture(texture));
 }
 
 void Widget::setFocused(bool focus) {

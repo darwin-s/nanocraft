@@ -27,12 +27,12 @@ Item::Item(const std::string& texture, const std::string& name)
 }
 
 void Item::setTexture(const std::string& texture) {
-    TextureAtlas::TextureInfo inf =
-        Game::getInstance()->getTextureAtlas().getTexture(texture);
-    m_sprite.setTexture(*inf.texture);
-    m_sprite.setTextureRect(inf.textureRect);
-    m_sprite.setScale(1.0f / static_cast<float>(inf.textureRect.width),
-                      1.0f / static_cast<float>(inf.textureRect.height));
+    m_sprite.setTexture(
+        Game::getInstance()->getTextureAtlas().getTexture(texture));
+    m_sprite.setScale(
+        1.0f / static_cast<float>(m_sprite.getTextureRect().width),
+        1.0f /
+            static_cast<float>(m_sprite.getTextureRect().height));
 }
 
 sf::Sprite& Item::getSprite() {

@@ -74,11 +74,10 @@ Tile::Tile(const std::string& texture, const std::string& name)
 }
 
 void Tile::setTexture(const std::string& texture) {
-    TextureAtlas::TextureInfo inf =
-        Game::getInstance()->getTextureAtlas().getTexture(texture);
-    sf::Sprite::setTexture(*inf.texture);
+    sf::Sprite::setTexture(
+        Game::getInstance()->getTextureAtlas().getTexture(texture));
     sf::Sprite::setTextureRect(sf::IntRect(16, 16, 16, 16));
-    m_size = Game::getInstance()->getTextureAtlas().getTileSize();
+    m_size = sf::Sprite::getTextureRect().width;
 }
 
 unsigned int Tile::getSize() const {

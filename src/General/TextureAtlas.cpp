@@ -18,30 +18,14 @@
 
 namespace nc {
 
-TextureAtlas::TextureAtlas(unsigned int tileSize)
-    : m_tileSize(tileSize), m_freeSprite(0) {
-    AtlasPage& p1 = m_textures[0];
-
-    p1.xFreeOffset = m_tileSize;
-    p1.yFreeOffset = 0;
-    p1.full        = false;
-    p1.tex.create(PAGE_SIZE, PAGE_SIZE);
-
+TextureAtlas::TextureAtlas() {
     // Create default texture
     sf::Image img;
-    img.create(m_tileSize, m_tileSize, sf::Color::Magenta);
-    p1.tex.update(img, 0, 0);
+    img.create(16, 16, sf::Color::Magenta);
+    sf::Texture t;
+    t.loadFromImage(img);
 
-    // Update the map
-    TextureInfo ti;
-    ti.texture            = &m_textures[0].tex;
-    ti.textureRect.left   = 0;
-    ti.textureRect.top    = 0;
-    ti.textureRect.width  = m_tileSize;
-    ti.textureRect.height = m_tileSize;
-    ti.textureIndex       = 0;
-
-    m_texInfo["default"] = ti;
+    m_textures["default"] = std::move(t);
 }
 
 bool TextureAtlas::addTexture(const std::filesystem::path& path) {
@@ -76,87 +60,20 @@ bool TextureAtlas::addTexture(const std::filesystem::path& path) {
     if (couldLoad) {
         img.loadFromMemory(fileData, fileSize);
     } else {
-        img.create(m_tileSize, m_tileSize, sf::Color::Magenta);
+        img.create(16, 16, sf::Color::Magenta);
     }
 
     delete[] fileData;
 
-    // Check if texture has the right size
-    if (img.getSize().x != m_tileSize || img.getSize().y != m_tileSize) {
-        sf::Texture t;
-        t.loadFromImage(img);
-        m_otherTextures[m_freeSprite++] = std::move(t);
+    sf::Texture t;
+    t.loadFromImage(img);
 
-        TextureInfo ti;
-        ti.texture            = &m_otherTextures[m_freeSprite - 1];
-        ti.textureRect.left   = 0;
-        ti.textureRect.top    = 0;
-        ti.textureRect.width  = img.getSize().x;
-        ti.textureRect.height = img.getSize().y;
-        ti.textureIndex       = 0;
-
-        m_texInfo[path.string()] = ti;
-
-        return true;
-    }
-
-    // Find first free page
-    unsigned int freeIndex = MAX_TEXTURES + 1;
-    for (unsigned int i = 0; i < MAX_TEXTURES; i++) {
-        if (!m_textures[i].full) {
-            freeIndex = i;
-            break;
-        }
-    }
-    // Error if no free space remains
-    if (freeIndex == MAX_TEXTURES + 1) {
-        throw std::runtime_error("No free space in texture atlas left!");
-    }
-
-    // Get the free space
-    if (m_textures[freeIndex].xFreeOffset == PAGE_SIZE) {
-        m_textures[freeIndex].xFreeOffset = 0;
-        m_textures[freeIndex].yFreeOffset += m_tileSize;
-    }
-
-    // Update part of the texture
-    m_textures[freeIndex].tex.update(img, m_textures[freeIndex].xFreeOffset,
-                                     m_textures[freeIndex].yFreeOffset);
-
-    // Update the map
-    TextureInfo ti;
-    ti.texture            = &m_textures[freeIndex].tex;
-    ti.textureRect.left   = m_textures[freeIndex].xFreeOffset;
-    ti.textureRect.top    = m_textures[freeIndex].yFreeOffset;
-    ti.textureRect.width  = m_tileSize;
-    ti.textureRect.height = m_tileSize;
-    ti.textureIndex       = freeIndex;
-
-    m_texInfo[path.string()] = ti;
-
-    // Set next free part
-    m_textures[freeIndex].xFreeOffset += m_tileSize;
-
-    // Check if this was the last space
-    if (m_textures[freeIndex].xFreeOffset == PAGE_SIZE &&
-        m_textures[freeIndex].yFreeOffset == PAGE_SIZE - m_tileSize) {
-        m_textures[freeIndex].full = true;
-        // Allocate next page if possible
-        if (freeIndex < MAX_TEXTURES - 1) {
-            AtlasPage& p = m_textures[freeIndex + 1];
-
-            p.xFreeOffset = 0;
-            p.yFreeOffset = 0;
-            p.full        = false;
-            p.tex.create(PAGE_SIZE, PAGE_SIZE);
-        }
-    }
+    m_textures[path.string()] = std::move(t);
 
     return couldLoad;
 }
 
-TextureAtlas::TextureInfo
-    TextureAtlas::getTexture(const std::string& texture) const {
+const sf::Texture& TextureAtlas::getTexture(const std::string& texture) const {
     std::string actualPath;
     if (texture != "default") {
         actualPath = "/textures/" + texture;
@@ -164,17 +81,13 @@ TextureAtlas::TextureInfo
         actualPath = texture;
     }
 
-    if (m_texInfo.find(actualPath) == m_texInfo.end()) {
+    if (m_textures.find(actualPath) == m_textures.end()) {
         spdlog::warn("Could not find texture {}! Using default one!",
                      actualPath);
-        return m_texInfo.at("default");
+        return m_textures.at("default");
     }
 
-    return m_texInfo.at(actualPath);
-}
-
-unsigned int TextureAtlas::getTileSize() const {
-    return m_tileSize;
+    return m_textures.at(actualPath);
 }
 
 }

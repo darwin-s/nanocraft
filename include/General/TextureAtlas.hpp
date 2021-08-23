@@ -17,7 +17,6 @@
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Rect.hpp>
-#include <array>
 #include <unordered_map>
 #include <filesystem>
 #include <string>
@@ -26,38 +25,12 @@ namespace nc {
 
 class TextureAtlas {
 public:
-    struct TextureInfo {
-        sf::Texture* texture;
-        sf::IntRect textureRect;
-        unsigned int textureIndex; // Used by the texture atlas
-    };
-
-public:
-    static constexpr unsigned int MAX_TEXTURES = 16;
-    static constexpr unsigned int DEFAULT_TILE_SIZE = 16;
-    static constexpr unsigned int PAGE_SIZE = 1024;
-    static constexpr unsigned int MAX_SPRITES = 2048;
-
-public:
-    explicit TextureAtlas(unsigned int tileSize = DEFAULT_TILE_SIZE);
+    explicit TextureAtlas();
     bool addTexture(const std::filesystem::path& path);
-    TextureInfo getTexture(const std::string& texture) const;
-    unsigned int getTileSize() const;
+    const sf::Texture& getTexture(const std::string& texture) const;
 
 private:
-    struct AtlasPage {
-        sf::Texture tex;
-        unsigned int xFreeOffset;
-        unsigned int yFreeOffset;
-        bool full;
-    };
-
-private:
-    std::array<AtlasPage, MAX_TEXTURES> m_textures;
-    std::array<sf::Texture, MAX_SPRITES> m_otherTextures;
-    unsigned int m_freeSprite;
-    std::unordered_map<std::string, TextureInfo> m_texInfo;
-    const unsigned int m_tileSize;
+    std::unordered_map<std::string, sf::Texture> m_textures;
 };
 
 }
