@@ -21,16 +21,20 @@
 namespace nc {
 
 class Item;
+class Tile;
 
 class GameRegistry {
 public:
     GameRegistry();
     ~GameRegistry();
     void registerItem(Item* item);
+    void registerTile(Tile* tile);
     Item* getItem(const std::string& name);
+    Tile* getTile(const std::string& name);
 
 private:
     std::unordered_map<std::string, Item*> m_items;
+    std::unordered_map<std::string, Tile*> m_tiles;
 };
 
 }

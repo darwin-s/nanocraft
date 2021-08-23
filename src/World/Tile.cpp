@@ -64,11 +64,12 @@ sf::IntRect Tile::m_textureRects[16] = {
     sf::IntRect(16, 16, 16, 16)  // up = 1, down = 1, left = 1, right = 1
 };
 
-Tile::Tile() : sf::Sprite() {
+Tile::Tile(const std::string& name) : sf::Sprite(), m_name(name) {
     setTexture("default");
 }
 
-Tile::Tile(const std::string& texture) : sf::Sprite() {
+Tile::Tile(const std::string& texture, const std::string& name)
+    : sf::Sprite(), m_name(name) {
     setTexture(texture);
 }
 
@@ -106,6 +107,14 @@ void Tile::update(unsigned int posX, unsigned int posY, Map* currentMap) {
                                                connected[2], connected[3]);
 
     sf::Sprite::setTextureRect(m_textureRects[idx]);
+}
+
+std::string Tile::getName() const {
+    return m_name;
+}
+
+void Tile::setName(const std::string& name) {
+    m_name = name;
 }
 
 }

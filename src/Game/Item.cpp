@@ -17,11 +17,12 @@
 
 namespace nc {
 
-Item::Item(const std::string& name) : m_name(name) {
+Item::Item(const std::string& name) : m_name(name), m_placeableTile("null") {
     setTexture("default");
 }
 
-Item::Item(const std::string& texture, const std::string& name) : m_name(name) {
+Item::Item(const std::string& texture, const std::string& name)
+    : m_name(name), m_placeableTile("null") {
     setTexture(texture);
 }
 
@@ -40,6 +41,10 @@ sf::Sprite& Item::getSprite() {
 
 const sf::Sprite& Item::getSprite() const {
     return m_sprite;
+}
+
+void Item::setPlaceableTile(const std::string& name) {
+    m_placeableTile = name;
 }
 
 Tile* Item::getPlaceableTile() const {

@@ -24,14 +24,17 @@ class Map;
 
 class Tile : public sf::Sprite {
 public:
-    Tile();
-    explicit Tile(const std::string& texture);
+    explicit Tile(const std::string& name = "null");
+    explicit Tile(const std::string& texture, const std::string& name);
     void setTexture(const std::string& texture);
     unsigned int getSize() const;
     void update(unsigned int posX, unsigned int posY, Map* currentMap);
+    void setName(const std::string& name);
+    std::string getName() const;
 
 private:
     unsigned int m_size;
+    std::string m_name;
     static sf::IntRect m_textureRects[16];
 };
 

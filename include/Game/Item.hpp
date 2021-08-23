@@ -23,18 +23,20 @@ namespace nc {
 
 class Item {
 public:
-    explicit Item(const std::string& name);
+    explicit Item(const std::string& name = "null");
     Item(const std::string& texture, const std::string& name);
     void setTexture(const std::string& texture);
     sf::Sprite& getSprite();
     const sf::Sprite& getSprite() const;
-    virtual Tile* getPlaceableTile() const;
+    void setPlaceableTile(const std::string& name);
+    Tile* getPlaceableTile() const;
     void setName(const std::string& name);
     std::string getName() const;
 
 private:
     sf::Sprite m_sprite;
     std::string m_name;
+    std::string m_placeableTile;
 };
 
 }

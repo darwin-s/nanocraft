@@ -14,6 +14,7 @@
 
 #include <Game/GameRegistry.hpp>
 #include <Game/Item.hpp>
+#include <World/Tile.hpp>
 
 namespace nc {
 
@@ -23,10 +24,18 @@ GameRegistry::~GameRegistry() {
     for (auto& i : m_items) {
         delete i.second;
     }
+
+    for (auto& t : m_tiles) {
+        delete t.second;
+    }
 }
 
 void GameRegistry::registerItem(Item* item) {
     m_items[item->getName()] = item;
+}
+
+void GameRegistry::registerTile(Tile* tile) {
+    m_tiles[tile->getName()] = tile;
 }
 
 Item* GameRegistry::getItem(const std::string& name) {
@@ -35,6 +44,14 @@ Item* GameRegistry::getItem(const std::string& name) {
     }
 
     return m_items[name];
+}
+
+Tile* GameRegistry::getTile(const std::string& name) {
+    if (m_tiles.find(name) == m_tiles.end()) {
+        return nullptr;
+    }
+
+    return m_tiles[name];
 }
 
 }
