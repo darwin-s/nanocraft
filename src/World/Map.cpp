@@ -14,6 +14,7 @@
 
 #include <World/Map.hpp>
 #include <Components/PlayerComponent.hpp>
+#include <Components/AnimationComponent.hpp>
 #include <General/Object.hpp>
 #include <random>
 #include <array>
@@ -178,6 +179,11 @@ void Map::simulateWorld(const float dt) {
                 generateChunk(xPos, yPos);
             }
         }
+    });
+
+    // Update animations
+    m_reg.view<AnimationComponent>().each([=](auto& ac) {
+        ac.update(dt);
     });
 }
 

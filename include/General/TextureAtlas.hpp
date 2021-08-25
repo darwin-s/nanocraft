@@ -25,6 +25,9 @@ namespace nc {
 
 class TextureAtlas {
 public:
+    static constexpr unsigned int TILE_SIZE = 16;
+
+public:
     explicit TextureAtlas();
     bool addTexture(const std::filesystem::path& path);
     const sf::Texture& getTexture(const std::string& texture) const;

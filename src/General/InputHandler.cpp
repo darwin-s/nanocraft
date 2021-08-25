@@ -16,6 +16,7 @@
 #include <Game/Game.hpp>
 #include <Components/PlayerInputComponent.hpp>
 #include <Components/VelocityComponent.hpp>
+#include <Components/AnimationComponent.hpp>
 
 namespace {
     static constexpr float PLAYER_VEL = 2.5f;
@@ -43,21 +44,68 @@ void InputHandler::pollInput(entt::registry& reg) {
         factor = CTRL_FACTOR;
     }
 
-    reg.view<PlayerInputComponent, VelocityComponent>().each([=](auto& vel) {
+    reg.view<PlayerInputComponent, VelocityComponent>().each([&](auto p, auto& vel) {
+        AnimationComponent* ac = reg.try_get<AnimationComponent>(p);
+        bool movingUp = false;
+        bool movingDown = false;
+        bool movingLeft = false;
+        bool movingRight = false;
+        std::string currentAnim;
+
         if (sf::Keyboard::isKeyPressed(getKey("move_up", sett))) {
             vel.velocity.y = -PLAYER_VEL * factor;
+            movingUp = true;
+            movingDown = false;
         }
 
         if (sf::Keyboard::isKeyPressed(getKey("move_down", sett))) {
             vel.velocity.y = PLAYER_VEL * factor;
+            movingUp = false;
+            movingDown = true;
         }
 
         if (sf::Keyboard::isKeyPressed(getKey("move_left", sett))) {
             vel.velocity.x = -PLAYER_VEL * factor;
+            movingLeft = true;
+            movingRight = false;
         }
 
         if (sf::Keyboard::isKeyPressed(getKey("move_right", sett))) {
             vel.velocity.x = PLAYER_VEL * factor;
+            movingLeft = false;
+            movingRight = true;
+        }
+
+        if (ac == nullptr) {
+            return;
+        }
+
+        currentAnim = ac->getCurrentAnimation();
+
+        if (movingLeft && !movingUp && !movingDown) {
+            if (currentAnim != "walk_left") {
+                ac->startAnimation("walk_left", true);
+            }
+        } else if (movingRight && !movingUp && !movingDown) {
+            if (currentAnim != "walk_right") {
+                ac->startAnimation("walk_right", true);
+            }
+        }
+
+        if (movingUp) {
+            if (currentAnim != "walk_up") {
+                ac->startAnimation("walk_up", true);
+            }
+        } else if (movingDown) {
+            if (currentAnim != "walk_down") {
+                ac->startAnimation("walk_down", true);
+            }
+        }
+
+        if (!movingUp && !movingDown && !movingLeft && !movingRight) {
+            if (currentAnim != "idle") {
+                ac->startAnimation("idle", true);
+            }
         }
     });
 }

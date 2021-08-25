@@ -21,17 +21,18 @@ namespace nc {
 
 Chunk::Chunk(const unsigned int xPos, const unsigned int yPos)
     : m_xPos(xPos), m_yPos(yPos), m_dirty(true) {
-    const unsigned int tileSize = 16;
-    m_tex.create(CHUNK_SIZE * tileSize, CHUNK_SIZE * tileSize);
-    m_sprite.setScale(1.0f / static_cast<float>(tileSize),
-                      1.0f / static_cast<float>(tileSize));
+    m_tex.create(CHUNK_SIZE * TextureAtlas::TILE_SIZE,
+                 CHUNK_SIZE * TextureAtlas::TILE_SIZE);
+    m_sprite.setScale(1.0f / static_cast<float>(TextureAtlas::TILE_SIZE),
+                      1.0f / static_cast<float>(TextureAtlas::TILE_SIZE));
     m_sprite.setPosition(Map::getGlobalPos(xPos, yPos));
     m_sprite.setTexture(m_tex.getTexture());
 
     for (unsigned int y = 0; y < CHUNK_SIZE; y++) {
         for (unsigned int x = 0; x < CHUNK_SIZE; x++) {
-            m_tiles[y][x].setPosition(static_cast<float>(x * tileSize),
-                                      static_cast<float>(y * tileSize));
+            m_tiles[y][x].setPosition(
+                static_cast<float>(x * TextureAtlas::TILE_SIZE),
+                static_cast<float>(y * TextureAtlas::TILE_SIZE));
         }
     }
 }

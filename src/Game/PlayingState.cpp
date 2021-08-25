@@ -20,6 +20,7 @@
 #include <Components/PlayerComponent.hpp>
 #include <Components/VelocityComponent.hpp>
 #include <Components/InventoryComponent.hpp>
+#include <Components/AnimationComponent.hpp>
 #include <General/Physics.hpp>
 
 namespace nc {
@@ -37,9 +38,18 @@ PlayingState::PlayingState()
     reg.emplace<VelocityComponent>(m_player);
     reg.emplace<sf::View*>(m_player, &Game::getInstance()->getView());
     reg.emplace<InventoryComponent>(m_player, PlayerInventory::PLAYER_INV_SIZE);
-    reg.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
+    reg.emplace<AnimationComponent>(m_player, entt::handle(reg, m_player));
     reg.get<Object>(m_player).setPosition(sf::Vector2f(16400.0f, 16400.0f));
     reg.get<sf::View*>(m_player)->setCenter(16400.0f, 16400.0f);
+    reg.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
+    reg.get<AnimationComponent>(m_player).setFramerate(6.0f);
+    reg.get<AnimationComponent>(m_player).setFrameSize(sf::Vector2i(16, 32));
+    reg.get<AnimationComponent>(m_player).addAnimation("idle", sf::Vector2i(0, 0), 4, true);
+    reg.get<AnimationComponent>(m_player).addAnimation("walk_up", sf::Vector2i(0, 32), 4, true);
+    reg.get<AnimationComponent>(m_player).addAnimation("walk_down", sf::Vector2i(0, 64), 4, true);
+    reg.get<AnimationComponent>(m_player).addAnimation("walk_right", sf::Vector2i(0, 96), 4, true);
+    reg.get<AnimationComponent>(m_player).addAnimation("walk_left", sf::Vector2i(0, 128), 4, true);
+    reg.get<AnimationComponent>(m_player).startAnimation("idle", true);
     m_playerInventory.setPlayer({reg, m_player});
     m_playerUI.setPlayer({reg, m_player});
     m_playerInventory.setShown(false);

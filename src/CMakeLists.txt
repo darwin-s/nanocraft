@@ -10,6 +10,7 @@ set(NC_INCLUDES
         ../include/Components/PlayerComponent.hpp
         ../include/Components/PlayerInputComponent.hpp
         ../include/Components/InventoryComponent.hpp
+        ../include/Components/AnimationComponent.hpp
         ../include/Game/Game.hpp
         ../include/Game/GameState.hpp
         ../include/Game/MainMenuState.hpp
@@ -37,6 +38,7 @@ set(NC_INCLUDES
 set(NC_SOURCES
         ${imgui_sfml_src}
         Components/InventoryComponent.cpp
+        Components/AnimationComponent.cpp
         Game/Game.cpp
         Game/GameState.cpp
         Game/MainMenuState.cpp
