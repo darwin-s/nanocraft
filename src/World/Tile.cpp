@@ -111,6 +111,10 @@ void Tile::update(unsigned int posX, unsigned int posY, Map* currentMap) {
     sf::Sprite::setTextureRect(m_textureRects[idx]);
 }
 
+void Tile::update(sf::Vector2u pos, Map* currentMap) {
+    update(pos.x, pos.y, currentMap);
+}
+
 std::string Tile::getName() const {
     return m_name;
 }

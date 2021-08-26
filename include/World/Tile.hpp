@@ -29,6 +29,7 @@ public:
     void setTexture(const std::string& texture);
     unsigned int getSize() const;
     void update(unsigned int posX, unsigned int posY, Map* currentMap);
+    void update(sf::Vector2u pos, Map* currentMap);
     void setName(const std::string& name);
     std::string getName() const;
     void setCollidable(bool collidable);

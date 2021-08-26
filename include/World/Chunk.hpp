@@ -31,7 +31,9 @@ public:
 public:
     Chunk(unsigned int xPos, unsigned int yPos);
     void setTile(Tile* tile, unsigned int xPos, unsigned int yPos);
+    void setTile(Tile* tile, sf::Vector2u pos);
     Tile& getTile(unsigned int x, unsigned  int y);
+    Tile& getTile(sf::Vector2u pos);
     void setDirty();
     sf::Vector2u getPosition() const;
 

@@ -24,11 +24,13 @@ namespace nc {
 
 class Map {
 public:
-    static constexpr unsigned int CHUNK_NO    = 1024;
+    static constexpr unsigned int CHUNK_NO = 1024;
 
 public:
     static sf::Vector2u getChunkPos(float x, float y);
+    static sf::Vector2u getChunkPos(unsigned int x, unsigned int y);
     static sf::Vector2u getChunkPos(sf::Vector2f pos);
+    static sf::Vector2u getChunkPos(sf::Vector2u pos);
     static sf::Vector2f getGlobalPos(unsigned int chunkX, unsigned int chunkY,
                                      unsigned int tileX = 0,
                                      unsigned int tileY = 0);
@@ -47,8 +49,11 @@ public:
     entt::registry& getRegistry();
     void simulateWorld(float dt);
     void placeTile(Tile* tile, unsigned int xPos, unsigned int yPos);
+    void placeTile(Tile* tile, sf::Vector2u pos);
     Tile* getTile(unsigned int xPos, unsigned int yPos);
+    Tile* getTile(sf::Vector2u pos);
     void updateTile(unsigned int tileX, unsigned int tileY);
+    void updateTile(sf::Vector2u pos);
 
 private:
     Chunk*** m_chunks;

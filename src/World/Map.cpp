@@ -26,7 +26,16 @@ sf::Vector2u Map::getChunkPos(float x, float y) {
                         static_cast<unsigned int>(y / Chunk::CHUNK_SIZE));
 }
 
+sf::Vector2u Map::getChunkPos(unsigned int x, unsigned y) {
+    return sf::Vector2u(x / Chunk::CHUNK_SIZE,
+                        y / Chunk::CHUNK_SIZE);
+}
+
 sf::Vector2u Map::getChunkPos(sf::Vector2f pos) {
+    return getChunkPos(pos.x, pos.y);
+}
+
+sf::Vector2u Map::getChunkPos(sf::Vector2u pos) {
     return getChunkPos(pos.x, pos.y);
 }
 
@@ -199,6 +208,10 @@ void Map::placeTile(Tile* tile, unsigned int xPos, unsigned int yPos) {
     }
 }
 
+void Map::placeTile(Tile* tile, sf::Vector2u pos) {
+    placeTile(tile, pos.x, pos.y);
+}
+
 Tile* Map::getTile(unsigned int xPos, unsigned int yPos) {
     sf::Vector2u cp = getChunkPos(xPos, yPos);
     Chunk* c        = getChunk(cp);
@@ -206,6 +219,10 @@ Tile* Map::getTile(unsigned int xPos, unsigned int yPos) {
     yPos -= cp.y * Chunk::CHUNK_SIZE;
 
     return c == nullptr ? nullptr : &c->getTile(xPos, yPos);
+}
+
+Tile* Map::getTile(sf::Vector2u pos) {
+    return getTile(pos.x, pos.y);
 }
 
 void Map::updateTile(unsigned int tileX, unsigned int tileY) {
@@ -228,6 +245,10 @@ void Map::updateTile(unsigned int tileX, unsigned int tileY) {
             }
         }
     }
+}
+
+void Map::updateTile(sf::Vector2u pos) {
+    updateTile(pos.x, pos.y);
 }
 
 }

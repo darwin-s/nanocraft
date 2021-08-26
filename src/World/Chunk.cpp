@@ -51,8 +51,16 @@ void Chunk::setTile(Tile* tile, unsigned int xPos, unsigned int yPos) {
     }
 }
 
+void Chunk::setTile(Tile* tile, sf::Vector2u pos) {
+    setTile(tile, pos.x, pos.y);
+}
+
 Tile& Chunk::getTile(const unsigned int x, const unsigned int y) {
     return m_tiles[y][x];
+}
+
+Tile& Chunk::getTile(sf::Vector2u pos) {
+    return getTile(pos.x, pos.y);
 }
 
 void Chunk::setDirty() {
