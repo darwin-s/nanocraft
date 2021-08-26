@@ -187,6 +187,18 @@ void Map::simulateWorld(const float dt) {
     });
 }
 
+void Map::placeTile(Tile* tile, unsigned int xPos, unsigned int yPos) {
+    sf::Vector2u cp           = getChunkPos(xPos, yPos);
+    Chunk* c                  = getChunk(cp);
+    const unsigned int chunkX = xPos - cp.x * Chunk::CHUNK_SIZE;
+    const unsigned int chunkY = yPos - cp.y * Chunk::CHUNK_SIZE;
+
+    if (c != nullptr) {
+        c->setTile(tile, chunkX, chunkY);
+        updateTile(xPos, yPos);
+    }
+}
+
 Tile* Map::getTile(unsigned int xPos, unsigned int yPos) {
     sf::Vector2u cp = getChunkPos(xPos, yPos);
     Chunk* c        = getChunk(cp);

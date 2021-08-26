@@ -37,6 +37,20 @@ Chunk::Chunk(const unsigned int xPos, const unsigned int yPos)
     }
 }
 
+void Chunk::setTile(Tile* tile, unsigned int xPos, unsigned int yPos) {
+    m_tiles[yPos][xPos] = *tile;
+    m_tiles[yPos][xPos].setPosition(
+            static_cast<float>(xPos * TextureAtlas::TILE_SIZE),
+            static_cast<float>(yPos * TextureAtlas::TILE_SIZE));
+    setDirty();
+
+    if (tile->isCollidable()) {
+        sf::Vector2f globalPos = Map::getGlobalPos(m_xPos, m_yPos, xPos, yPos);
+        m_tiles[yPos][xPos].setCollisionBox(
+            sf::FloatRect(globalPos.x, globalPos.y, 1.0f, 1.0f));
+    }
+}
+
 Tile& Chunk::getTile(const unsigned int x, const unsigned int y) {
     return m_tiles[y][x];
 }

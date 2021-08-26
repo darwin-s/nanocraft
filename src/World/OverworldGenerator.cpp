@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <World/OverworldGenerator.hpp>
+#include <Game/Game.hpp>
 #include <random>
 
 namespace nc {
@@ -49,9 +50,9 @@ void OverworldGenerator::generateChunk(Chunk* chunk) const {
 void OverworldGenerator::makeLandscape(unsigned int x, unsigned int y,
                                        float noiseVal, Chunk* chunk) const {
     if (noiseVal < 0.0f) {
-        chunk->getTile(x, y).setTexture("sand.png");
+        chunk->setTile(Game::getInstance()->getRegistry().getTile("sand"), x, y);
     } else {
-        chunk->getTile(x, y).setTexture("grass_tile.png");
+        chunk->setTile(Game::getInstance()->getRegistry().getTile("grass"), x, y);
     }
 }
 

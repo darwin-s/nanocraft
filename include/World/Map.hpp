@@ -45,7 +45,8 @@ public:
     void generateChunk(unsigned int x, unsigned int y);
     void generateChunk(sf::Vector2u pos);
     entt::registry& getRegistry();
-    void simulateWorld([[maybe_unused]] float dt);
+    void simulateWorld(float dt);
+    void placeTile(Tile* tile, unsigned int xPos, unsigned int yPos);
     Tile* getTile(unsigned int xPos, unsigned int yPos);
     void updateTile(unsigned int tileX, unsigned int tileY);
 

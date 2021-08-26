@@ -64,12 +64,15 @@ sf::IntRect Tile::m_textureRects[16] = {
     sf::IntRect(16, 16, 16, 16)  // up = 1, down = 1, left = 1, right = 1
 };
 
-Tile::Tile(const std::string& name) : sf::Sprite(), m_name(name) {
+Tile::Tile(const std::string& name)
+    : sf::Sprite(), m_name(name), m_hasCollision(false),
+      m_collisionBox(0.0f, 0.0f, 0.0f, 0.0f) {
     setTexture("default");
 }
 
 Tile::Tile(const std::string& texture, const std::string& name)
-    : sf::Sprite(), m_name(name) {
+    : sf::Sprite(), m_name(name), m_hasCollision(false),
+      m_collisionBox(0.0f, 0.0f, 0.0f, 0.0f) {
     setTexture(texture);
 }
 
@@ -115,5 +118,22 @@ std::string Tile::getName() const {
 void Tile::setName(const std::string& name) {
     m_name = name;
 }
+
+void Tile::setCollidable(bool collidable) {
+    m_hasCollision = collidable;
+}
+
+bool Tile::isCollidable() const {
+    return m_hasCollision;
+}
+
+void Tile::setCollisionBox(const sf::FloatRect& collisionBox) {
+    m_collisionBox = collisionBox;
+}
+
+const sf::FloatRect& Tile::getCollisionBox() {
+    return m_collisionBox;
+}
+
 
 }

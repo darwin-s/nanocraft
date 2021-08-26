@@ -31,10 +31,16 @@ public:
     void update(unsigned int posX, unsigned int posY, Map* currentMap);
     void setName(const std::string& name);
     std::string getName() const;
+    void setCollidable(bool collidable);
+    bool isCollidable() const;
+    void setCollisionBox(const sf::FloatRect& collisionBox);
+    const sf::FloatRect& getCollisionBox();
 
 private:
     unsigned int m_size;
     std::string m_name;
+    bool m_hasCollision;
+    sf::FloatRect m_collisionBox;
     static sf::IntRect m_textureRects[16];
 };
 

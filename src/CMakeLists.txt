@@ -11,6 +11,7 @@ set(NC_INCLUDES
         ../include/Components/PlayerInputComponent.hpp
         ../include/Components/InventoryComponent.hpp
         ../include/Components/AnimationComponent.hpp
+        ../include/Components/CollisionBoxComponent.hpp
         ../include/Game/Game.hpp
         ../include/Game/GameState.hpp
         ../include/Game/MainMenuState.hpp

@@ -21,6 +21,7 @@
 #include <Components/VelocityComponent.hpp>
 #include <Components/InventoryComponent.hpp>
 #include <Components/AnimationComponent.hpp>
+#include <Components/CollisionBoxComponent.hpp>
 #include <General/Physics.hpp>
 
 namespace nc {
@@ -39,6 +40,7 @@ PlayingState::PlayingState()
     reg.emplace<sf::View*>(m_player, &Game::getInstance()->getView());
     reg.emplace<InventoryComponent>(m_player, PlayerInventory::PLAYER_INV_SIZE);
     reg.emplace<AnimationComponent>(m_player, entt::handle(reg, m_player));
+    reg.emplace<CollisionBoxComponent>(m_player);
     reg.get<Object>(m_player).setPosition(sf::Vector2f(16400.0f, 16400.0f));
     reg.get<sf::View*>(m_player)->setCenter(16400.0f, 16400.0f);
     reg.get<Object>(m_player).setSize(sf::Vector2u(1, 2));
@@ -50,6 +52,7 @@ PlayingState::PlayingState()
     reg.get<AnimationComponent>(m_player).addAnimation("walk_right", sf::Vector2i(0, 96), 4, true);
     reg.get<AnimationComponent>(m_player).addAnimation("walk_left", sf::Vector2i(0, 128), 4, true);
     reg.get<AnimationComponent>(m_player).startAnimation("idle", true);
+    reg.get<CollisionBoxComponent>(m_player).box = sf::FloatRect(16400.0f, 16401.0f, 1.0f, 1.0f);
     m_playerInventory.setPlayer({reg, m_player});
     m_playerUI.setPlayer({reg, m_player});
     m_playerInventory.setShown(false);
@@ -58,6 +61,11 @@ PlayingState::PlayingState()
     Item* i = new Item("grass.png", "grass");
     Game::getInstance()->getRegistry().registerItem(i);
     reg.get<InventoryComponent>(m_player).inventory[4 * 9].setItem(i, 5);
+    Tile* g = new Tile("grass_tile.png", "grass");
+    Tile* s = new Tile("sand.png", "sand");
+    s->setCollidable(true);
+    Game::getInstance()->getRegistry().registerTile(g);
+    Game::getInstance()->getRegistry().registerTile(s);
 }
 
 PlayingState::~PlayingState() {
@@ -88,9 +96,7 @@ void PlayingState::handleEvent(sf::Event e) {
                 sf::Vector2f worldPos =
                     Game::getInstance()->getWindow().mapPixelToCoords(
                         mousePos, Game::getInstance()->getView());
-                m_map->getTile(worldPos.x, worldPos.y)->setTexture("grass_tile.png");
-                m_map->updateTile(worldPos.x, worldPos.y);
-                m_map->getChunk(Map::getChunkPos(worldPos))->setDirty();
+                m_map->placeTile(Game::getInstance()->getRegistry().getTile("grass"), worldPos.x, worldPos.y);
                 s.setCount(s.getCount() - 1);
             }
         } else if (e.mouseButton.button == sf::Mouse::Right) {
@@ -122,7 +128,7 @@ void PlayingState::handleEvent(sf::Event e) {
 
 void PlayingState::update(const float dt) {
     // Simulate physics
-    Physics::simulate(m_map->getRegistry(), dt);
+    Physics::simulate(m_map->getRegistry(), dt, m_map);
     // Simulate world
     m_map->simulateWorld(dt);
 }
