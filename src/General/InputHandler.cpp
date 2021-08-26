@@ -76,6 +76,10 @@ void InputHandler::pollInput(entt::registry& reg) {
             movingRight = true;
         }
 
+        if ((movingUp || movingDown) && (movingLeft || movingRight)) {
+            vel.velocity /= sqrtf(2.0f);
+        }
+
         if (ac == nullptr) {
             return;
         }
