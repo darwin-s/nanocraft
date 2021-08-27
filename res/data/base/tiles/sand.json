@@ -1,0 +1,5 @@
+{
+    "name": "sand",
+    "texture": "sand.png",
+    "collidable": true
+}

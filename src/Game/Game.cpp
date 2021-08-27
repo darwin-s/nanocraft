@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <Game/Game.hpp>
+#include <Game/Item.hpp>
 #include <General/Version.hpp>
 #include <Game/MainMenuState.hpp>
 #include <World/Chunk.hpp>
@@ -28,6 +29,38 @@
 
 namespace {
 
+PHYSFS_EnumerateCallbackResult populateJson(const std::string& path,
+                                            nlohmann::json& json) {
+    PHYSFS_File* fileHandle = PHYSFS_openRead(path.c_str());
+    PHYSFS_sint64 fileSize;
+    PHYSFS_sint64 read;
+    char* fileData = nullptr;
+
+    if (fileHandle == NULL) {
+        spdlog::warn("Could not open file {}!", path);
+        return PHYSFS_ENUM_ERROR;
+    } else {
+        fileSize = PHYSFS_fileLength(fileHandle);
+        if (fileSize == -1) {
+            spdlog::warn("Could not retreive size for file {}!", path);
+            return PHYSFS_ENUM_ERROR;
+        }
+        fileData = new char[fileSize];
+        read     = PHYSFS_readBytes(fileHandle, fileData, fileSize);
+        if (read < fileSize) {
+            spdlog::warn("Could not read file {}!", path);
+            delete[] fileData;
+            return PHYSFS_ENUM_ERROR;
+        }
+        PHYSFS_close(fileHandle);
+    }
+
+    json = nlohmann::json::parse(fileData, fileData + fileSize);
+    delete[] fileData;
+
+    return PHYSFS_ENUM_OK;
+}
+
 PHYSFS_EnumerateCallbackResult
     loadTextureCallback(void* data, const char* origdir, const char* fname) {
     std::string texPath;
@@ -38,6 +71,56 @@ PHYSFS_EnumerateCallbackResult
     if (!nc::Game::getInstance()->getTextureAtlas().addTexture(texPath)) {
         spdlog::error("Could not load texture {}", texPath);
     }
+
+    return PHYSFS_ENUM_OK;
+}
+
+PHYSFS_EnumerateCallbackResult loadItemCallback(void* data, const char* origdir,
+                                                const char* fname) {
+    std::string path;
+    path += origdir;
+    path += '/';
+    path += fname;
+
+    nlohmann::json j;
+
+    if (populateJson(path, j) != PHYSFS_ENUM_OK) {
+        return PHYSFS_ENUM_OK;
+    }
+
+    nc::Item* i = new nc::Item;
+    i->setName(j["name"].get<std::string>());
+    i->setTexture(j["texture"].get<std::string>());
+    if (j.contains("placeTile")) {
+        i->setPlaceableTile(j["placeTile"].get<std::string>());
+    }
+
+    nc::Game::getInstance()->getRegistry().registerItem(i);
+
+    return PHYSFS_ENUM_OK;
+}
+
+PHYSFS_EnumerateCallbackResult loadTileCallback(void* data, const char* origdir,
+                                                const char* fname) {
+    std::string path;
+    path += origdir;
+    path += '/';
+    path += fname;
+
+    nlohmann::json j;
+
+    if (populateJson(path, j) != PHYSFS_ENUM_OK) {
+        return PHYSFS_ENUM_OK;
+    }
+
+    nc::Tile* t = new nc::Tile;
+    t->setName(j["name"].get<std::string>());
+    t->setTexture(j["texture"].get<std::string>());
+    if (j.contains("collidable")) {
+        t->setCollidable(j["collidable"].get<bool>());
+    }
+
+    nc::Game::getInstance()->getRegistry().registerTile(t);
 
     return PHYSFS_ENUM_OK;
 }
@@ -188,6 +271,8 @@ void Game::setup() {
 
 void Game::execute() {
     loadTextures();
+    loadItems();
+    loadTiles();
 
     // Get into the main menu
     setState(new MainMenuState());
@@ -296,6 +381,14 @@ void Game::createDefaultSettings() {
 
 void Game::loadTextures() {
     PHYSFS_enumerate("/textures", loadTextureCallback, NULL);
+}
+
+void Game::loadItems() {
+    PHYSFS_enumerate("/items", loadItemCallback, NULL);
+}
+
+void Game::loadTiles() {
+    PHYSFS_enumerate("/tiles", loadTileCallback, NULL);
 }
 
 }

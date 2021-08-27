@@ -57,15 +57,6 @@ PlayingState::PlayingState()
     m_playerUI.setPlayer({reg, m_player});
     m_playerInventory.setShown(false);
     m_playerUI.setShown(true);
-    // TODO delete this
-    Item* i = new Item("grass.png", "grass");
-    Game::getInstance()->getRegistry().registerItem(i);
-    reg.get<InventoryComponent>(m_player).inventory[4 * 9].setItem(i, 5);
-    Tile* g = new Tile("grass_tile.png", "grass");
-    Tile* s = new Tile("sand.png", "sand");
-    s->setCollidable(true);
-    Game::getInstance()->getRegistry().registerTile(g);
-    Game::getInstance()->getRegistry().registerTile(s);
 }
 
 PlayingState::~PlayingState() {
